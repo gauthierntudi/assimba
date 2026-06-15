@@ -1,0 +1,26 @@
+# Dependencies
+node_modules
+dist
+build
+*.local
+
+# Env
+.env
+.env.*
+!.env.example
+!client/.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / IDE
+.DS_Store
+.idea
+.vscode
+
+# Prisma
+server/node_modules/.prisma
+
+# Vite
+client/dist

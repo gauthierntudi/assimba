@@ -1,0 +1,73 @@
+# simba-react
+
+Migration **AS Simba** (inscription supporter) vers **React + Node + PostgreSQL (Neon)** avec **Prisma**.
+
+Sous-projet React du dossier **ASSIMBA** (remplace progressivement le frontend PHP/HTML).
+
+## Structure
+
+```
+simba-react/
+├── client/          # React (Vite + TypeScript)
+├── server/          # API Express + Prisma Client
+├── prisma/          # Schéma PostgreSQL (Neon)
+└── package.json     # Monorepo npm workspaces
+```
+
+## Prérequis
+
+- Node.js 20+
+- Compte [Neon](https://neon.tech) (PostgreSQL)
+
+## Installation
+
+```bash
+cd simba-react
+cp .env.example .env
+cp client/.env.example client/.env
+
+# Renseigner DATABASE_URL Neon dans .env
+npm install
+npm run db:generate
+npm run db:push
+```
+
+## Développement
+
+```bash
+# API (4000) + React (5173)
+npm run dev
+```
+
+- Frontend : http://localhost:5173
+- API health : http://localhost:4000/api/health
+
+## Scripts
+
+| Commande | Description |
+|----------|-------------|
+| `npm run dev` | Lance client + server |
+| `npm run dev:client` | React seul |
+| `npm run dev:server` | API seule |
+| `npm run db:generate` | Génère le client Prisma |
+| `npm run db:push` | Pousse le schéma vers Neon |
+| `npm run db:migrate` | Migration Prisma (prod) |
+| `npm run db:studio` | Prisma Studio |
+
+## Schéma Prisma
+
+Tables migrées depuis ASSIMBA :
+
+- `supporters` — profil supporter
+- `invoices` — factures / paiements FlexPay
+
+## Prochaines étapes
+
+1. Porter les 5 étapes du formulaire (`index.html` → composants React)
+2. Implémenter les routes API : drafts, check-phone, payments, callback
+3. Brancher FlexPay + Twilio
+4. Admin React ou API séparée
+
+## Variables d'environnement
+
+Voir `.env.example` (Neon, FlexPay, Twilio, JWT admin).
