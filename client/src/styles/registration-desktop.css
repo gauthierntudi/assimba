@@ -158,6 +158,7 @@ body.reg-desktop-active {
 /* ── Main panel ── */
 
 .reg-desktop-main {
+  position: relative;
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -165,21 +166,84 @@ body.reg-desktop-active {
   padding: 32px;
   box-sizing: border-box;
   overflow: hidden;
+  background: linear-gradient(180deg, rgba(88, 0, 0, 0.92) 0%, rgba(58, 0, 0, 0.97) 100%);
+}
+
+.reg-desktop-main__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.reg-desktop-main__pattern {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 0;
+  width: min(280px, 32vw);
+  max-height: min(620px, 78vh);
+  height: auto;
+  transform: translateY(-50%);
+  object-fit: contain;
+  object-position: right center;
+  opacity: 0.8;
 }
 
 .reg-desktop-panel {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   width: min(100%, 640px);
   max-height: 100%;
   padding: 40px 48px 32px;
-  border-radius: 28px;
-  background: linear-gradient(180deg, rgba(88, 0, 0, 0.92) 0%, rgba(58, 0, 0, 0.97) 100%);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  --reg-field-height: 56px;
+  --reg-form-gap: 16px;
+}
+
+.reg-desktop-panel .reg-mobile__form {
+  width: 100%;
+  max-width: none;
+}
+
+.reg-desktop-panel .reg-mobile__field {
+  width: 100%;
+  max-width: none;
+}
+
+.reg-desktop-panel .reg-mobile__field input,
+.reg-desktop-panel .reg-mobile__field select {
+  font-size: 15px;
+}
+
+.reg-desktop-panel .reg-mobile__field--phone-iti .iti__tel-input,
+.reg-desktop-panel .reg-mobile__field--phone-iti .iti input[type='tel'] {
+  font-size: 15px;
+}
+
+.reg-desktop-panel .reg-mobile__field--phone-iti .iti__selected-dial-code {
+  font-size: 15px;
+}
+
+.reg-desktop-panel .reg-mobile__social-grid {
+  gap: 16px;
+}
+
+.reg-desktop-panel .reg-mobile__location-toggle {
+  gap: 12px;
+}
+
+.reg-desktop-panel .reg-mobile__cta {
+  min-width: 148px;
+  font-size: 16px;
 }
 
 .reg-desktop-panel--busy {
@@ -210,12 +274,7 @@ body.reg-desktop-active {
   line-height: 1.45;
 }
 
-.reg-desktop-panel .reg-mobile__form {
-  width: 100%;
-  max-width: none;
-}
-
-.reg-desktop-panel .reg-mobile__form--contact {
+.reg-desktop-panel--contact .reg-mobile__form--contact {
   gap: 36px;
 }
 

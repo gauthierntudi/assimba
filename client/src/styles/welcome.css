@@ -198,9 +198,10 @@ body.welcome-active {
 }
 
 .welcome-tagline-group {
-  width: max-content;
+  width: 100%;
   max-width: 362px;
   margin-top: 14px;
+  align-self: center;
 }
 
 .welcome-carousel-dots {
@@ -214,8 +215,11 @@ body.welcome-active {
 .welcome-carousel-dots__dot {
   width: 8px;
   height: 8px;
+  padding: 0;
+  border: 0;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
 }
 
 .welcome-carousel-dots__dot--active {
@@ -224,8 +228,9 @@ body.welcome-active {
 
 .welcome-tagline {
   margin-top: 0;
+  width: 100%;
   max-width: 362px;
-  text-align: left;
+  text-align: center;
   color: #fff;
   font-family: 'Instrument Sans', 'Barlow', sans-serif;
   font-size: clamp(24px, 7vw, 32px);
@@ -242,6 +247,28 @@ body.welcome-active {
   align-self: center;
 }
 
+.welcome-community__viewport {
+  overflow: hidden;
+  width: 100%;
+  touch-action: pan-y;
+}
+
+.welcome-community__track {
+  display: flex;
+  width: 100%;
+  transition: transform 0.35s ease;
+  will-change: transform;
+}
+
+.welcome-community__track--instant {
+  transition: none;
+}
+
+.welcome-community__slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+}
+
 .welcome-community__card {
   display: flex;
   align-items: flex-start;
@@ -253,6 +280,58 @@ body.welcome-active {
   border-radius: 16px;
   text-align: left;
   box-sizing: border-box;
+}
+
+.welcome-community__card--image {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+}
+
+.welcome-community__card--image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.welcome-community__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.05) 35%,
+    rgba(88, 0, 0, 0.45) 68%,
+    rgba(40, 0, 0, 0.82) 100%
+  );
+  pointer-events: none;
+}
+
+.welcome-community__overlay-label {
+  margin: 0;
+  color: #fff;
+  font-family: 'Instrument Sans', 'Barlow', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.welcome-community__overlay-text {
+  margin: 4px 0 0;
+  max-width: 220px;
+  color: #fff;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .welcome-community__stats {
@@ -436,8 +515,12 @@ body.welcome-active {
   font-size: 9px;
   font-weight: 600;
   line-height: 1.2;
-  text-decoration: none;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-footer__link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .welcome-footer__link:hover {

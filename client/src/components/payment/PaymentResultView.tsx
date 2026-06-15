@@ -1,4 +1,5 @@
 import { Check, X } from 'lucide-react';
+import { TermsFooterLink } from '../legal/TermsFooterLink';
 import type { PaymentResultData } from '../../types/paymentResult';
 
 type PaymentResultViewProps = {
@@ -87,9 +88,7 @@ export function PaymentResultView({ result, onRetry, onDownloadCard }: PaymentRe
       </div>
 
       <footer className="payment-result-footer">
-        <a href="#" className="payment-result-footer__link">
-          Conditions d&apos;utilisation
-        </a>
+        <TermsFooterLink className="payment-result-footer__link" />
         <span className="payment-result-footer__credit">Powered by Aksys Digital</span>
       </footer>
     </>

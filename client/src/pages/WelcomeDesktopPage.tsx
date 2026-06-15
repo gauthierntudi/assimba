@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { TermsFooterLink } from '../components/legal/TermsFooterLink';
 import '../styles/welcome-desktop.css';
 
 type WelcomeDesktopPageProps = {
@@ -33,6 +34,14 @@ export function WelcomeDesktopPage({ onStart }: WelcomeDesktopPageProps) {
       </aside>
 
       <main className="welcome-desktop-main">
+        <div className="welcome-desktop-main__bg" aria-hidden="true">
+          <img
+            className="welcome-desktop-main__pattern"
+            src="/img/pattern.png"
+            alt=""
+          />
+        </div>
+
         <section className="welcome-desktop-card" aria-label="La communauté">
           <div className="welcome-desktop-card__stats">
             <p className="welcome-desktop-card__label">La communauté</p>
@@ -61,9 +70,7 @@ export function WelcomeDesktopPage({ onStart }: WelcomeDesktopPageProps) {
           </div>
 
           <footer className="welcome-desktop-footer">
-            <a href="#" className="welcome-desktop-footer__link">
-              Conditions d&apos;utilisation
-            </a>
+            <TermsFooterLink className="welcome-desktop-footer__link" />
             <span className="welcome-desktop-footer__credit">Powered by Aksys Digital</span>
           </footer>
         </section>

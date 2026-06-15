@@ -1,4 +1,5 @@
 import { CtaArrow } from '../icons/CtaArrow';
+import { TermsFooterLink } from '../legal/TermsFooterLink';
 import type { RegistrationFlow } from '../../hooks/useRegistrationFlow';
 
 type RegistrationNavProps = Pick<
@@ -44,9 +45,7 @@ export function RegistrationNav({
 export function RegistrationFooter() {
   return (
     <footer className="reg-mobile__footer">
-      <a href="#" className="reg-mobile__footer-link">
-        Conditions d&apos;utilisation
-      </a>
+      <TermsFooterLink className="reg-mobile__footer-link" />
       <span className="reg-mobile__footer-credit">Powered by Aksys Digital</span>
     </footer>
   );

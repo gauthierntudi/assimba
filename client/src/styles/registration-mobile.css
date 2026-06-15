@@ -3,7 +3,7 @@
 body.reg-mobile-active {
   padding: 0;
   overflow: hidden;
-  background: #a60000;
+  background: #830606;
 }
 
 .visually-hidden {
@@ -25,7 +25,7 @@ body.reg-mobile-active {
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  background: #a60000;
+  background: var(--mobile-form-gradient);
   min-height: 100dvh;
 }
 
@@ -37,7 +37,7 @@ body.reg-mobile-active {
   max-height: none;
   overflow: hidden;
   border-radius: 0;
-  background: #a60000;
+  background: transparent;
 }
 
 @media (max-width: 767px) {
@@ -46,74 +46,16 @@ body.reg-mobile-active {
   }
 }
 
-/* ── Background ── */
-
-.reg-mobile__bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.reg-mobile__bg-red {
-  position: absolute;
-  inset: 0;
-  background: #a60000;
-}
-
-.reg-mobile__bg-photo {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(120, 0, 0, 0.55) 0%,
-      rgba(90, 0, 0, 0.72) 50%,
-      rgba(60, 0, 0, 0.88) 100%
-    ),
-    url('/img/bg-start.jpg') center / cover no-repeat;
-  opacity: 0.85;
-}
-
-.reg-mobile__bg-lion {
-  position: absolute;
-  right: -20%;
-  top: 18%;
-  z-index: 1;
-  width: 85%;
-  max-width: 420px;
-  height: auto;
-  opacity: 0.14;
-  object-fit: contain;
-  object-position: right center;
-  pointer-events: none;
-}
-
-.reg-mobile__bg-veil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: rgba(8, 6, 5, 0.18);
-}
-
-.reg-mobile__bg-pattern {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  z-index: 2;
-  width: 150px;
-  max-height: min(520px, 62vh);
-  height: auto;
-  transform: translateY(-50%);
-  object-fit: contain;
-  object-position: right center;
-  opacity: 0.4;
-  pointer-events: none;
-}
+/* ── Background : mobile-form-surface.css ── */
 
 /* ── Layout ── */
+
+.reg-mobile__content,
+.reg-desktop-panel {
+  --reg-field-width: 100%;
+  --reg-form-gap: 15px;
+  --reg-field-height: 54px;
+}
 
 .reg-mobile__content {
   position: relative;
@@ -129,9 +71,6 @@ body.reg-mobile-active {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: max(48px, env(safe-area-inset-top)) 28px max(24px, env(safe-area-inset-bottom));
-  --reg-field-width: 100%;
-  --reg-form-gap: 15px;
-  --reg-field-height: 54px;
 }
 
 .reg-mobile__header {
@@ -165,20 +104,16 @@ body.reg-mobile-active {
 .reg-mobile__dot {
   display: block;
   flex-shrink: 0;
+  box-sizing: border-box;
   width: 10px;
-  height: 8px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.25);
-  transition: width 0.2s ease, background-color 0.2s ease;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .reg-mobile__dot--active {
-  width: 28px;
   background: #fff;
-}
-
-.reg-mobile__dot--done {
-  background: #bc4848;
 }
 
 /* ── Header text ── */
@@ -216,25 +151,6 @@ body.reg-mobile-active {
   max-width: 100%;
   min-width: 0;
 }
-
-.reg-mobile__draft-notice {
-  margin: 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  color: #fff;
-  font-size: 13px;
-  line-height: 1.45;
-  text-align: left;
-}
-
-.reg-mobile__draft-notice--error {
-  background: rgba(255, 72, 72, 0.18);
-  border-color: rgba(255, 140, 140, 0.55);
-  color: #fff;
-}
-
 
 /* ── Fields ── */
 
@@ -307,39 +223,64 @@ body.reg-mobile-active {
 }
 
 .reg-mobile__field--phone-iti .iti {
-  display: block;
+  display: flex;
+  align-items: stretch;
   width: 100%;
   max-width: 100%;
+  min-height: var(--reg-field-height);
   background: #f8f7fb;
   border-radius: 10px;
   border: 1px solid #f8f7fb;
   box-sizing: border-box;
 }
 
+.reg-mobile__field--phone-iti .iti.iti--allow-dropdown,
+.reg-mobile__field--phone-iti .iti.iti--show-selected-dial-code {
+  display: flex;
+  align-items: stretch;
+}
+
 .reg-mobile__field--phone-iti .iti__country-container {
-  padding-left: 12px;
+  position: static;
+  top: auto;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 10px;
+  border-right: 1px solid #e8e4ef;
 }
 
 .reg-mobile__field--phone-iti .iti__selected-country {
-  padding-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  padding: 0 10px 0 0;
+  white-space: nowrap;
 }
 
 .reg-mobile__field--phone-iti .iti__selected-dial-code {
   color: #7f909f;
   font-family: 'Poppins', 'Barlow', sans-serif;
   font-size: 14px;
-  font-weight: 400;
-  margin-left: 6px;
+  font-weight: 500;
+  margin-left: 0;
+  flex-shrink: 0;
 }
 
 .reg-mobile__field--phone-iti .iti__tel-input,
 .reg-mobile__field--phone-iti .iti input[type='tel'] {
-  width: 100%;
-  max-width: 100%;
+  flex: 1 1 auto;
+  width: auto !important;
+  min-width: 0;
+  max-width: none;
   height: var(--reg-field-height);
-  padding-right: 23px;
+  padding: 0 16px !important;
   border: none;
-  border-radius: 10px;
+  border-radius: 0 10px 10px 0;
   background: transparent;
   color: #1c1412;
   font-family: 'Poppins', 'Barlow', sans-serif;
@@ -349,6 +290,19 @@ body.reg-mobile-active {
   letter-spacing: 0.14px;
   outline: none;
   box-sizing: border-box;
+}
+
+.reg-mobile__field--phone-iti .iti--show-selected-dial-code .iti__selected-country {
+  background-color: transparent;
+}
+
+.reg-mobile__field--phone-iti .iti__flag-box {
+  flex-shrink: 0;
+}
+
+.reg-mobile__field--phone-iti .iti__arrow {
+  margin-left: 2px;
+  flex-shrink: 0;
 }
 
 .reg-mobile__field--phone-iti .iti__tel-input::placeholder,
@@ -475,12 +429,16 @@ body.reg-mobile-active {
   font-size: 8px;
   font-weight: 600;
   line-height: 1.2;
-  text-decoration: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  text-shadow: none;
+}
+
+.reg-mobile__footer-link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .reg-mobile__footer-link:hover {
-  text-decoration: underline;
+  color: #a50303;
 }
 
 .reg-mobile__footer-credit {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import {
   buildRegistrationPayload,
   checkPaymentStatus,
@@ -30,7 +31,6 @@ export function useRegistrationFlow() {
   const [stepFour, setStepFour] = useState(initialStepFourForm);
   const [stepFive, setStepFive] = useState(initialStepFiveForm);
   const [paymentResult, setPaymentResult] = useState<PaymentResultData | null>(null);
-  const [identityPhoneError, setIdentityPhoneError] = useState<string | null>(null);
   const [loading, setLoading] = useState<{ title: string; description: string } | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollCancelledRef = useRef(false);
@@ -269,7 +269,7 @@ export function useRegistrationFlow() {
       const result = await verifyPhoneAndRestoreDraft(forms.stepOne.phone, forms);
 
       if (result.status === 'paid') {
-        setIdentityPhoneError(result.message);
+        toast.error(result.message || 'Ce numéro est déjà utilisé.');
         return;
       }
 
@@ -289,7 +289,6 @@ export function useRegistrationFlow() {
         description: 'Sauvegarde de vos informations en cours.',
       });
 
-      setIdentityPhoneError(null);
       applyForms(nextForms);
       await saveDraftQuietly(nextForms);
       setCurrentStep(3);
@@ -307,9 +306,6 @@ export function useRegistrationFlow() {
   };
 
   const handleStepOneChange = (patch: Partial<typeof stepOne>) => {
-    if (patch.phone && patch.phone !== stepOne.phone) {
-      setIdentityPhoneError(null);
-    }
     setStepOne((prev) => ({ ...prev, ...patch }));
   };
 
@@ -325,7 +321,6 @@ export function useRegistrationFlow() {
     setStepFour,
     setStepFive,
     paymentResult,
-    identityPhoneError,
     loading,
     isBusy,
     showPrevNext,

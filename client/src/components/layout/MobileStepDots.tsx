@@ -12,7 +12,6 @@ export function MobileStepDots({ currentStep }: MobileStepDotsProps) {
         const className = [
           'reg-mobile__dot',
           step === currentStep ? 'reg-mobile__dot--active' : '',
-          step < currentStep ? 'reg-mobile__dot--done' : '',
         ]
           .filter(Boolean)
           .join(' ');

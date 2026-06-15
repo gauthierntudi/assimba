@@ -41,6 +41,14 @@ export function RegistrationDesktopPage({ flow }: RegistrationDesktopPageProps) 
       </aside>
 
       <div className="reg-desktop-main">
+        <div className="reg-desktop-main__bg" aria-hidden="true">
+          <img
+            className="reg-desktop-main__pattern"
+            src="/img/pattern.png"
+            alt=""
+          />
+        </div>
+
         <div
           className={`reg-desktop-panel${flow.isContactStep ? ' reg-desktop-panel--contact' : ''}${flow.isBusy ? ' reg-desktop-panel--busy' : ''}`}
         >

@@ -5,6 +5,7 @@ import { RegistrationLoadingOverlay } from '../components/registration/Registrat
 import { RegistrationStepForm } from '../components/registration/RegistrationStepForm';
 import { RegistrationStepHeader } from '../components/registration/RegistrationStepHeader';
 import type { RegistrationFlow } from '../hooks/useRegistrationFlow';
+import '../styles/mobile-form-surface.css';
 import '../styles/registration-mobile.css';
 
 type RegistrationMobilePageProps = {
@@ -20,23 +21,7 @@ export function RegistrationMobilePage({ flow }: RegistrationMobilePageProps) {
   return (
     <div className="reg-mobile-screen">
       <div className="reg-mobile-frame">
-        <div className="reg-mobile__bg">
-          <div className="reg-mobile__bg-red" aria-hidden="true" />
-          <div className="reg-mobile__bg-photo" aria-hidden="true" />
-          <img
-            className="reg-mobile__bg-lion"
-            src="/img/Pattern_lion_as_simba.svg"
-            alt=""
-            aria-hidden="true"
-          />
-          <div className="reg-mobile__bg-veil" aria-hidden="true" />
-          <img
-            className="reg-mobile__bg-pattern"
-            src="/img/pattern.png"
-            alt=""
-            aria-hidden="true"
-          />
-        </div>
+        <div className="reg-mobile__bg mobile-form-surface" aria-hidden="true" />
 
         <div
           className={`reg-mobile__content${flow.isContactStep ? ' reg-mobile__content--contact' : ''}${flow.isBusy ? ' reg-mobile__content--busy' : ''}`}

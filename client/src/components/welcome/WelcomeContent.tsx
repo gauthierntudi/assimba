@@ -1,4 +1,6 @@
 import { ArrowRight } from 'lucide-react';
+import { TermsFooterLink } from '../legal/TermsFooterLink';
+import { WelcomeCommunityBlock } from './WelcomeCommunitySlider';
 
 type WelcomeContentProps = {
   onStart: () => void;
@@ -27,36 +29,8 @@ export function WelcomeContent({ onStart }: WelcomeContentProps) {
 
         <div className="welcome-tagline-group">
           <h2 className="welcome-tagline">Rejoignez la famille</h2>
-          <div className="welcome-carousel-dots" aria-hidden="true">
-            <span className="welcome-carousel-dots__dot welcome-carousel-dots__dot--active" />
-            <span className="welcome-carousel-dots__dot" />
-            <span className="welcome-carousel-dots__dot" />
-          </div>
+          <WelcomeCommunityBlock />
         </div>
-
-        <section className="welcome-community" aria-label="La communauté">
-          <div className="welcome-community__card">
-            <div className="welcome-community__stats">
-              <p className="welcome-community__label">La communauté</p>
-              <div className="welcome-community__figures">
-                <p className="welcome-community__count">+2K</p>
-                <p className="welcome-community__metric">Supporters.</p>
-              </div>
-              <p className="welcome-community__caption">
-                Une communauté qui grandit chaque jour
-              </p>
-            </div>
-
-            <div className="welcome-community__visual">
-              <div className="welcome-community__photo">
-                <img src="/img/img01.jpg" alt="Supporters AS Simba" />
-              </div>
-              <p className="welcome-community__quote">
-                Rejoignez une communauté de passionnés qui grandit chaque saison.
-              </p>
-            </div>
-          </div>
-        </section>
       </div>
 
       <div className="welcome-bottom">
@@ -75,9 +49,7 @@ export function WelcomeContent({ onStart }: WelcomeContentProps) {
         </div>
 
         <footer className="welcome-footer">
-          <a href="#" className="welcome-footer__link">
-            Conditions d&apos;utilisation
-          </a>
+          <TermsFooterLink className="welcome-footer__link" />
           <span className="welcome-footer__credit">Powered by Aksys Digital</span>
         </footer>
       </div>

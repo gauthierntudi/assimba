@@ -240,7 +240,11 @@ body.payment-result-active {
   font-family: 'Inter', 'Barlow', sans-serif;
   font-size: 8px;
   font-weight: 600;
-  text-decoration: none;
+}
+
+.payment-result-footer__link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .payment-result-footer__credit {

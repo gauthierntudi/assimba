@@ -1,0 +1,20 @@
+/* React-Toastify — thème AS Simba */
+
+:root {
+  --toastify-color-error: #cd0404;
+  --toastify-text-color-error: #fff;
+  --toastify-font-family: 'Inter', 'Barlow', sans-serif;
+}
+
+.Toastify__toast-container--top-center {
+  top: max(16px, env(safe-area-inset-top));
+  width: min(360px, calc(100vw - 32px));
+}
+
+.Toastify__toast {
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+}

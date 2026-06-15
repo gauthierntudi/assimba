@@ -6,7 +6,6 @@ import { SelectChevron } from '../icons/SelectChevron';
 type StepIdentityMobileProps = {
   form: StepOneForm;
   formId: string;
-  error?: string | null;
   onChange: (patch: Partial<StepOneForm>) => void;
   onNext: () => void;
 };
@@ -30,7 +29,6 @@ const GENDER_OPTIONS: { value: Gender; label: string }[] = [
 export function StepIdentityMobile({
   form,
   formId,
-  error,
   onChange,
   onNext,
 }: StepIdentityMobileProps) {
@@ -41,12 +39,6 @@ export function StepIdentityMobile({
 
   return (
     <form id={formId} className="reg-mobile__form" onSubmit={handleSubmit}>
-      {error ? (
-        <p className="reg-mobile__draft-notice reg-mobile__draft-notice--error" role="alert">
-          {error}
-        </p>
-      ) : null}
-
       <label className="reg-mobile__field">
         <span className="visually-hidden">Votre prénom</span>
         <input

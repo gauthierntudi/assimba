@@ -92,14 +92,41 @@ body.welcome-desktop-active {
 }
 
 .welcome-desktop-main {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 100dvh;
   padding: 40px;
   box-sizing: border-box;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(88, 0, 0, 0.92) 0%, rgba(58, 0, 0, 0.97) 100%);
+}
+
+.welcome-desktop-main__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.welcome-desktop-main__pattern {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 0;
+  width: min(280px, 32vw);
+  max-height: min(620px, 78vh);
+  height: auto;
+  transform: translateY(-50%);
+  object-fit: contain;
+  object-position: right center;
+  opacity: 0.55;
 }
 
 .welcome-desktop-card {
+  position: relative;
+  z-index: 1;
   width: min(100%, 560px);
   padding: 40px;
   border-radius: 28px;
@@ -204,6 +231,11 @@ body.welcome-desktop-active {
   text-decoration: none;
 }
 
-.welcome-desktop-footer__link:hover {
+.welcome-desktop-footer__link {
   text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.welcome-desktop-footer__link:hover {
+  color: #a50303;
 }
