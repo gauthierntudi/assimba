@@ -1,13 +1,12 @@
 import './_lib/setup.js';
-import { checkPaymentStatus, handleFlexpayCallback, initiatePayment } from './_dist/services/flexpay.service.js';
-import {
-  checkPhone,
-  parseBodyToSupporter,
-  upsertSupporter,
-} from './_dist/services/supporter.service.js';
 import { bodyRecord, methodNotAllowed, queryString, type ApiRequest, type ApiResponse } from './_lib/http.js';
 
 function pathname(req: ApiRequest): string {
+  const fromQuery = queryString(req.query, 'path');
+  if (fromQuery) {
+    return fromQuery.startsWith('/api/') ? fromQuery : `/api/${fromQuery}`;
+  }
+
   const raw = req.url ?? '/api';
   if (raw.startsWith('/')) return raw.split('?')[0] ?? raw;
   return new URL(raw, 'http://localhost').pathname;
@@ -34,6 +33,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         return;
       }
 
+      const { checkPhone } = await import('./_dist/services/supporter.service.js');
       res.status(200).json(await checkPhone(phone));
       return;
     }
@@ -44,6 +44,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         return;
       }
 
+      const { parseBodyToSupporter, upsertSupporter } = await import(
+        './_dist/services/supporter.service.js'
+      );
       const input = parseBodyToSupporter(bodyRecord(req));
       if (!input.phone) {
         res.status(400).json({
@@ -64,6 +67,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         return;
       }
 
+      const { initiatePayment } = await import('./_dist/services/flexpay.service.js');
       res.status(200).json(await initiatePayment(bodyRecord(req)));
       return;
     }
@@ -80,6 +84,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         return;
       }
 
+      const { checkPaymentStatus } = await import('./_dist/services/flexpay.service.js');
       res.status(200).json(await checkPaymentStatus(order));
       return;
     }
@@ -90,11 +95,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         return;
       }
 
+      const { handleFlexpayCallback } = await import('./_dist/services/flexpay.service.js');
       res.status(200).json(await handleFlexpayCallback(bodyRecord(req)));
       return;
     }
 
-    res.status(404).json({ success: false, message: 'Route not found' });
+    res.status(404).json({ success: false, message: 'Route not found', path });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Server error';
     res.status(500).json({ success: false, message });
