@@ -1,10 +1,16 @@
-import { Prisma } from '@prisma/client';
 import { env, flexpayCallbackUrl } from '../config/env.js';
-import { prisma } from '../lib/prisma.js';
 import { buildInvoiceReference } from '../utils/payload.js';
 import { isValidFlexpayDrcPhone, toFlexpayPhone } from '../utils/phone.js';
 import { calculatePricing } from './pricing.service.js';
+import {
+  attachFlexpayOrderNumber,
+  getInvoiceStatusByFlexpayReference,
+  markPaymentAttemptFailed,
+  markPaymentAttemptPaid,
+  startPaymentAttempt,
+} from './purchase.service.js';
 import { upsertSupporter, parseBodyToSupporter } from './supporter.service.js';
+import { prisma } from '../lib/prisma.js';
 
 type FlexpayMobileResponse = {
   code?: string;
@@ -61,19 +67,28 @@ export async function initiatePayment(body: Record<string, unknown>) {
   }
 
   const supporterId = await upsertSupporter(input, { includeMemberType: true });
+
+  const existingInvoice = await prisma.invoice.findUnique({
+    where: { supporterId },
+    select: { status: true },
+  });
+
+  if (existingInvoice?.status === 'paid') {
+    return {
+      success: false as const,
+      message: 'Ce numéro est déjà enregistré avec un paiement réussi.',
+    };
+  }
+
   const flexpayRef = buildInvoiceReference(supporterId);
 
-  const invoice = await prisma.invoice.create({
-    data: {
-      supporterId,
-      reference: flexpayRef,
-      flexpayReference: flexpayRef,
-      amount: new Prisma.Decimal(String(pricing.amount)),
-      currency: pricing.currency,
-      paymentType,
-      paymentPhone: paymentPhone || null,
-      status: 'pending',
-    },
+  await startPaymentAttempt({
+    supporterId,
+    reference: flexpayRef,
+    amount: pricing.amount,
+    currency: pricing.currency,
+    paymentType,
+    paymentPhone: paymentPhone || null,
   });
 
   const description = `Inscription Supporter: ${input.firstname} ${input.lastname}`;
@@ -82,6 +97,10 @@ export async function initiatePayment(body: Record<string, unknown>) {
     const flexpayPhone = toFlexpayPhone(paymentPhone || input.phone);
 
     if (!isValidFlexpayDrcPhone(flexpayPhone)) {
+      await markPaymentAttemptFailed(
+        flexpayRef,
+        'Numéro Mobile Money invalide. Utilisez un numéro RDC actif (ex. 0812345678).',
+      );
       return {
         success: false as const,
         message:
@@ -113,6 +132,7 @@ export async function initiatePayment(body: Record<string, unknown>) {
     const raw = await response.text();
 
     if (!response.ok) {
+      await markPaymentAttemptFailed(flexpayRef, `Erreur API FlexPay (HTTP ${response.status})`);
       return {
         success: false as const,
         message: `Erreur API FlexPay (HTTP ${response.status})`,
@@ -123,13 +143,7 @@ export async function initiatePayment(body: Record<string, unknown>) {
     const result = JSON.parse(raw) as FlexpayMobileResponse;
 
     if (String(result.code) === '0' && result.orderNumber) {
-      await prisma.invoice.update({
-        where: { id: invoice.id },
-        data: {
-          flexpayReference: result.orderNumber,
-          paymentPhone: flexpayPhone,
-        },
-      });
+      await attachFlexpayOrderNumber(flexpayRef, result.orderNumber, flexpayPhone);
 
       return {
         success: true as const,
@@ -138,6 +152,11 @@ export async function initiatePayment(body: Record<string, unknown>) {
         orderNumber: result.orderNumber,
       };
     }
+
+    await markPaymentAttemptFailed(
+      flexpayRef,
+      result.message ?? 'Erreur inconnue de FlexPay lors du lancement mobile',
+    );
 
     return {
       success: false as const,
@@ -174,14 +193,12 @@ export async function initiatePayment(body: Record<string, unknown>) {
     };
   }
 
+  await markPaymentAttemptFailed(flexpayRef, 'Type de paiement invalide');
   return { success: false as const, message: 'Type de paiement invalide' };
 }
 
 export async function checkPaymentStatus(orderNumber: string) {
-  const invoice = await prisma.invoice.findFirst({
-    where: { flexpayReference: orderNumber },
-    select: { status: true },
-  });
+  const invoice = await getInvoiceStatusByFlexpayReference(orderNumber);
 
   if (invoice?.status === 'paid') {
     const { finalizeRegistration } = await import('./registration.service.js');
@@ -205,10 +222,7 @@ export async function checkPaymentStatus(orderNumber: string) {
       const txStatus = data.transaction.status;
 
       if (String(txStatus) === '0') {
-        await prisma.invoice.updateMany({
-          where: { flexpayReference: orderNumber },
-          data: { status: 'paid' },
-        });
+        await markPaymentAttemptPaid(orderNumber);
 
         const { finalizeRegistration } = await import('./registration.service.js');
         await finalizeRegistration(orderNumber);
@@ -217,6 +231,18 @@ export async function checkPaymentStatus(orderNumber: string) {
       }
 
       if (String(txStatus) === '1') {
+        const attempt = await prisma.purchaseHistory.findFirst({
+          where: { flexpayReference: orderNumber },
+          select: { reference: true },
+        });
+
+        if (attempt?.reference) {
+          await markPaymentAttemptFailed(
+            attempt.reference,
+            'Transaction échouée ou annulée par le client.',
+          );
+        }
+
         return {
           success: true as const,
           status: 'failed' as const,
@@ -236,10 +262,7 @@ export async function handleFlexpayCallback(payload: Record<string, unknown>) {
       return { status: 'ignored' as const };
     }
 
-    await prisma.invoice.updateMany({
-      where: { flexpayReference: orderNumber },
-      data: { status: 'paid' },
-    });
+    await markPaymentAttemptPaid(orderNumber);
 
     const { finalizeRegistration } = await import('./registration.service.js');
     await finalizeRegistration(orderNumber);

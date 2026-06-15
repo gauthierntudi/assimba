@@ -40,26 +40,6 @@ body.reg-mobile-active {
   background: #a60000;
 }
 
-@media (min-width: 768px) {
-  body.reg-mobile-active {
-    background: #1c1412;
-  }
-
-  .reg-mobile-screen {
-    align-items: center;
-    justify-content: center;
-    background: #1c1412;
-  }
-
-  .reg-mobile-frame {
-    width: min(100%, 393px);
-    height: 100%;
-    max-height: 852px;
-    min-height: 0;
-    border-radius: 36px;
-  }
-}
-
 @media (max-width: 767px) {
   .reg-mobile__title {
     font-size: 26px;
@@ -152,12 +132,6 @@ body.reg-mobile-active {
   --reg-field-width: 100%;
   --reg-form-gap: 15px;
   --reg-field-height: 54px;
-}
-
-@media (min-width: 768px) {
-  .reg-mobile__content {
-    padding: 52px 20px max(24px, env(safe-area-inset-bottom));
-  }
 }
 
 .reg-mobile__header {
@@ -613,11 +587,39 @@ body.reg-mobile-active {
   font-weight: 400;
   line-height: 20px;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.reg-mobile__social-card--selected {
-  border-color: #cd0404;
+.reg-mobile__social-card--selected.reg-mobile__social-card--facebook {
+  background: #1877f2;
+  border-color: #1877f2;
+  color: #fff;
+}
+
+.reg-mobile__social-card--selected.reg-mobile__social-card--instagram {
+  background: linear-gradient(45deg, #f58529 0%, #dd2a7b 50%, #8134af 100%);
+  border-color: #dd2a7b;
+  color: #fff;
+}
+
+.reg-mobile__social-card--selected.reg-mobile__social-card--tiktok {
+  background: linear-gradient(135deg, #25f4ee 0%, #fe2c55 100%);
+  border-color: #fe2c55;
+  color: #fff;
+}
+
+.reg-mobile__social-card--selected.reg-mobile__social-card--twitter-x {
+  background: #0f0f0f;
+  border-color: #0f0f0f;
+  color: #fff;
+}
+
+.reg-mobile__social-card--selected .reg-mobile__social-icon .bi {
+  color: #fff;
 }
 
 .reg-mobile__social-icon {

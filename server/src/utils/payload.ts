@@ -1,3 +1,4 @@
+import type { Supporter } from '@prisma/client';
 import type { Prisma } from '@prisma/client';
 
 export type SupporterInput = {
@@ -76,6 +77,40 @@ export function parseSupporterPayload(body: Record<string, unknown>): SupporterI
     socialIg: socialFlag(body.social_ig ?? body.socialIg),
     socialTt: socialFlag(body.social_tt ?? body.socialTt),
     memberType: pickString(body, 'member_type', 'memberType') || 'simple',
+  };
+}
+
+export function mergeSupporterInput(existing: Supporter, input: SupporterInput): SupporterInput {
+  const keep = (value: string, fallback: string | null | undefined) =>
+    value.trim() ? value : (fallback ?? '');
+
+  const keepYears = (value: number | null, fallback: number | null | undefined) =>
+    value != null ? value : (fallback ?? null);
+
+  return {
+    firstname: keep(input.firstname, existing.firstname),
+    lastname: keep(input.lastname, existing.lastname),
+    middlename: keep(input.middlename, existing.middlename),
+    gender: keep(input.gender, existing.gender),
+    ageRange: keep(input.ageRange, existing.ageRange),
+    phone: keep(input.phone, existing.phone),
+    countryStatus: keep(input.countryStatus, existing.countryStatus),
+    province: keep(input.province, existing.province),
+    city: keep(input.city, existing.city),
+    town: keep(input.town, existing.town),
+    section: keep(input.section, existing.section),
+    occupation: keep(input.occupation, existing.occupation),
+    contribution: keep(input.contribution, existing.contribution),
+    merch: keep(input.merch, existing.merch),
+    years: keepYears(input.years, existing.years),
+    trainingFreq: keep(input.trainingFreq, existing.trainingFreq),
+    matchFreq: keep(input.matchFreq, existing.matchFreq),
+    followMethod: keep(input.followMethod, existing.followMethod),
+    socialFb: input.socialFb || existing.socialFb || '',
+    socialX: input.socialX || existing.socialX || '',
+    socialIg: input.socialIg || existing.socialIg || '',
+    socialTt: input.socialTt || existing.socialTt || '',
+    memberType: keep(input.memberType ?? '', existing.memberType) || 'simple',
   };
 }
 

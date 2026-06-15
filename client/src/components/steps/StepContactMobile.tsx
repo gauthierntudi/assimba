@@ -123,7 +123,13 @@ export function StepContactMobile({ form, formId, onChange, onNext }: StepContac
               <button
                 key={key}
                 type="button"
-                className={`reg-mobile__social-card${selected ? ' reg-mobile__social-card--selected' : ''}`}
+                className={[
+                  'reg-mobile__social-card',
+                  `reg-mobile__social-card--${network}`,
+                  selected ? 'reg-mobile__social-card--selected' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 aria-pressed={selected}
                 onClick={() => toggleSocial(key)}
               >

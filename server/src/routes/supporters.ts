@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { checkPhone, parseBodyToSupporter, upsertSupporter } from '../services/supporter.service.js';
+import { prisma } from '../lib/prisma.js';
+import { mergeSupporterInput } from '../utils/payload.js';
+import { phoneLookupVariants } from '../utils/phone.js';
 
 const router = Router();
 
@@ -22,9 +25,9 @@ router.post(
 router.post(
   '/draft',
   asyncHandler(async (req, res) => {
-    const input = parseBodyToSupporter(req.body);
+    const parsed = parseBodyToSupporter(req.body);
 
-    if (!input.phone) {
+    if (!parsed.phone) {
       res.status(400).json({
         success: false,
         message: 'Numéro de téléphone manquant pour la sauvegarde.',
@@ -32,6 +35,11 @@ router.post(
       return;
     }
 
+    const existing = await prisma.supporter.findFirst({
+      where: { phone: { in: phoneLookupVariants(parsed.phone) } },
+    });
+
+    const input = existing ? mergeSupporterInput(existing, parsed) : parsed;
     await upsertSupporter(input);
     res.json({ success: true });
   }),

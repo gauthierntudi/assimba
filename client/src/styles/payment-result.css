@@ -28,26 +28,6 @@ body.payment-result-active {
   background: #fbf6f0;
 }
 
-@media (min-width: 768px) {
-  body.payment-result-active {
-    background: #1c1412;
-  }
-
-  .payment-result-screen {
-    align-items: center;
-    justify-content: center;
-    background: #1c1412;
-  }
-
-  .payment-result-frame {
-    width: min(100%, 393px);
-    height: 100%;
-    max-height: 852px;
-    min-height: 0;
-    border-radius: 36px;
-  }
-}
-
 /* ── Background ── */
 
 .payment-result-bg {

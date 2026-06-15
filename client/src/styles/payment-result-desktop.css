@@ -1,0 +1,75 @@
+/* Payment result — desktop layout (≥ 1024px) */
+
+body.payment-result-desktop-active {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #1c1412;
+}
+
+.payment-result-desktop-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  grid-template-columns: minmax(360px, 42%) 1fr;
+  min-height: 100dvh;
+  background: #1c1412;
+}
+
+.payment-result-desktop-aside {
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-result-desktop-aside__photo {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(120, 0, 0, 0.55) 0%,
+      rgba(90, 0, 0, 0.78) 55%,
+      rgba(40, 0, 0, 0.95) 100%
+    ),
+    url('/img/bg-start.jpg') center / cover no-repeat;
+}
+
+.payment-result-desktop-aside__veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 6, 5, 0.22);
+}
+
+.payment-result-desktop-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.payment-result-desktop-card {
+  width: min(100%, 520px);
+  padding: 48px 40px 32px;
+  border-radius: 28px;
+  background: #fbf6f0;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.payment-result-desktop-card .payment-result-main {
+  margin-top: 0;
+  max-width: none;
+}
+
+.payment-result-desktop-card .payment-result-actions {
+  padding-top: 24px;
+}
+
+.payment-result-desktop-card .payment-result-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e2ddd9;
+}

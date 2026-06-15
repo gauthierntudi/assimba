@@ -57,15 +57,12 @@ export async function checkPhone(phone: string) {
     return { success: true as const, exists: false as const };
   }
 
-  const paidInvoice = await prisma.invoice.findFirst({
-    where: {
-      supporterId: supporter.id,
-      status: 'paid',
-    },
-    select: { id: true },
+  const paidInvoice = await prisma.invoice.findUnique({
+    where: { supporterId: supporter.id },
+    select: { id: true, status: true },
   });
 
-  if (paidInvoice) {
+  if (paidInvoice?.status === 'paid') {
     return {
       success: true as const,
       exists: true as const,

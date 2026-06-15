@@ -28,26 +28,6 @@ body.welcome-active {
   background: #fbf6f0;
 }
 
-@media (min-width: 768px) {
-  body.welcome-active {
-    background: #1c1412;
-  }
-
-  .welcome-screen {
-    align-items: center;
-    justify-content: center;
-    background: #1c1412;
-  }
-
-  .welcome-frame {
-    width: min(100%, 393px);
-    height: 100%;
-    max-height: 852px;
-    min-height: 0;
-    border-radius: 36px;
-  }
-}
-
 @media (max-width: 767px) {
   .welcome-content {
     padding: max(32px, env(safe-area-inset-top)) 15px max(20px, env(safe-area-inset-bottom));

@@ -10,7 +10,7 @@
     "server"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
+    "dev": "concurrently -k -n server,client -c red,blue \"npm run dev -w server\" \"npx --yes wait-on@8.0.1 http-get://127.0.0.1:4000/api/health -t 60000 && npm run dev -w client\"",
     "dev:client": "npm run dev -w client",
     "dev:server": "npm run dev -w server",
     "build": "npm run build -w client && npm run build -w server",

@@ -1,0 +1,86 @@
+import { Check, X } from 'lucide-react';
+import type { PaymentResultData } from '../../types/paymentResult';
+
+type PaymentResultViewProps = {
+  result: PaymentResultData;
+  onRetry?: () => void;
+  onDownloadCard?: () => void;
+};
+
+const SUCCESS_MESSAGE = (
+  <>
+    Votre inscription a été effectuée avec succès.
+    <br />
+    Bienvenue dans la famille
+    <br />
+    AS Simba Kamikazes !
+  </>
+);
+
+const DEFAULT_FAILURE_MESSAGE = (
+  <>
+    La transaction a été refusée, annulée
+    <br />
+    ou votre solde est insuffisant.
+  </>
+);
+
+export function PaymentResultView({ result, onRetry, onDownloadCard }: PaymentResultViewProps) {
+  const isSuccess = result.status === 'success';
+
+  const handleDownloadCard = () => {
+    if (result.cardDownloadUrl) {
+      window.open(result.cardDownloadUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    onDownloadCard?.();
+  };
+
+  return (
+    <>
+      <main className="payment-result-main">
+        <div
+          className={`payment-result-icon${isSuccess ? '' : ' payment-result-icon--failed'}`}
+          aria-hidden="true"
+        >
+          {isSuccess ? (
+            <Check className="payment-result-icon__glyph" strokeWidth={3} />
+          ) : (
+            <X className="payment-result-icon__glyph" strokeWidth={3} />
+          )}
+        </div>
+
+        <h1 className="payment-result-title">{isSuccess ? 'BIENVENUE!' : 'ÉCHEC'}</h1>
+
+        <p className="payment-result-message">
+          {isSuccess ? SUCCESS_MESSAGE : (result.message ?? DEFAULT_FAILURE_MESSAGE)}
+        </p>
+
+        {isSuccess && result.orderNumber && (
+          <p className="payment-result-reference">
+            Référence : <strong>{result.orderNumber}</strong>
+          </p>
+        )}
+      </main>
+
+      <div className="payment-result-actions">
+        {isSuccess ? (
+          <button type="button" className="payment-result-btn" onClick={handleDownloadCard}>
+            Télécharger ma carte
+          </button>
+        ) : (
+          <button type="button" className="payment-result-btn" onClick={onRetry}>
+            Réessayer
+          </button>
+        )}
+      </div>
+
+      <footer className="payment-result-footer">
+        <a href="#" className="payment-result-footer__link">
+          Conditions d&apos;utilisation
+        </a>
+        <span className="payment-result-footer__credit">Powered by Aksys Digital</span>
+      </footer>
+    </>
+  );
+}

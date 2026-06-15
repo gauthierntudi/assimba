@@ -46,6 +46,10 @@ function socialFlag(value: boolean): string {
   return value ? '1' : '';
 }
 
+function parseSocialFlag(value: unknown): boolean {
+  return value === true || value === 1 || value === '1' || value === 'on';
+}
+
 export function mapDraftToFormPatch(data: Record<string, unknown>): DraftFormPatch {
   return {
     stepOne: {
@@ -60,10 +64,10 @@ export function mapDraftToFormPatch(data: Record<string, unknown>): DraftFormPat
       province: String(data.province ?? ''),
       city: String(data.city ?? ''),
       town: String(data.town ?? ''),
-      socialFb: data.social_fb === '1',
-      socialX: data.social_x === '1',
-      socialIg: data.social_ig === '1',
-      socialTt: data.social_tt === '1',
+      socialFb: parseSocialFlag(data.social_fb),
+      socialX: parseSocialFlag(data.social_x),
+      socialIg: parseSocialFlag(data.social_ig),
+      socialTt: parseSocialFlag(data.social_tt),
     },
     stepThree: {
       occupation: String(data.occupation ?? ''),
@@ -80,6 +84,29 @@ export function mapDraftToFormPatch(data: Record<string, unknown>): DraftFormPat
     stepFive: {
       memberType: (data.member_type as MemberType) || 'simple',
     },
+  };
+}
+
+export type RegistrationForms = {
+  stepOne: StepOneForm;
+  stepTwo: StepTwoForm;
+  stepThree: StepThreeForm;
+  stepFour: StepFourForm;
+  stepFive: StepFiveForm;
+};
+
+export function mergeDraftIntoForms(
+  forms: RegistrationForms,
+  data: Record<string, unknown>,
+): RegistrationForms {
+  const patch = mapDraftToFormPatch(data);
+
+  return {
+    stepOne: { ...forms.stepOne, ...patch.stepOne },
+    stepTwo: { ...forms.stepTwo, ...patch.stepTwo },
+    stepThree: { ...forms.stepThree, ...patch.stepThree },
+    stepFour: { ...forms.stepFour, ...patch.stepFour },
+    stepFive: { ...forms.stepFive, ...patch.stepFive },
   };
 }
 

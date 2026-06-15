@@ -1,0 +1,209 @@
+/* Welcome — desktop layout (≥ 1024px) */
+
+body.welcome-desktop-active {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #1c1412;
+}
+
+.welcome-desktop-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  grid-template-columns: minmax(360px, 42%) 1fr;
+  min-height: 100dvh;
+  background: #1c1412;
+}
+
+.welcome-desktop-aside {
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-desktop-aside__bg {
+  position: absolute;
+  inset: 0;
+}
+
+.welcome-desktop-aside__photo {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(120, 0, 0, 0.78) 0%,
+      rgba(90, 0, 0, 0.88) 45%,
+      rgba(40, 0, 0, 0.97) 100%
+    ),
+    url('/img/bg-start.jpg') center / cover no-repeat;
+}
+
+.welcome-desktop-aside__veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 6, 5, 0.28);
+}
+
+.welcome-desktop-aside__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+  padding: 64px 56px;
+  box-sizing: border-box;
+}
+
+.welcome-desktop-aside__logo {
+  width: 104px;
+  height: 104px;
+  object-fit: contain;
+}
+
+.welcome-desktop-aside__title {
+  margin: 28px 0 10px;
+  color: #fff;
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  font-size: 56px;
+  font-weight: 400;
+  line-height: 0.95;
+}
+
+.welcome-desktop-aside__founded {
+  margin: 0 0 20px;
+  color: rgba(255, 255, 255, 0.82);
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.welcome-desktop-aside__tagline {
+  margin: 0;
+  color: #fff;
+  font-family: 'Instrument Sans', 'Barlow', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.welcome-desktop-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.welcome-desktop-card {
+  width: min(100%, 560px);
+  padding: 40px;
+  border-radius: 28px;
+  background: #fbf6f0;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  box-sizing: border-box;
+}
+
+.welcome-desktop-card__label {
+  margin: 0 0 8px;
+  color: #6b635c;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.welcome-desktop-card__count {
+  margin: 0 0 8px;
+  color: #1c1412;
+  font-family: 'Instrument Sans', 'Barlow', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.welcome-desktop-card__caption {
+  margin: 0 0 28px;
+  color: #6b635c;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.welcome-desktop-card__visual {
+  overflow: hidden;
+  border-radius: 18px;
+  margin-bottom: 32px;
+}
+
+.welcome-desktop-card__visual img {
+  display: block;
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+}
+
+.welcome-desktop-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcome-desktop-cta {
+  flex: 1;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 24px;
+  background: #cd0404;
+  color: #fff;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.welcome-desktop-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(205, 4, 4, 0.35);
+}
+
+.welcome-desktop-cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 9999px;
+  background: #cd0404;
+  color: #fff;
+  cursor: pointer;
+}
+
+.welcome-desktop-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid #e2ddd9;
+}
+
+.welcome-desktop-footer__link,
+.welcome-desktop-footer__credit {
+  color: #cd0404;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.welcome-desktop-footer__link:hover {
+  text-decoration: underline;
+}

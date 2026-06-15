@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { RegistrationMobilePage } from './pages/RegistrationMobilePage';
+import { RegistrationPage } from './pages/RegistrationPage';
 import { WelcomePage } from './pages/WelcomePage';
 import { parsePaymentReturnFromUrl } from './utils/paymentReturn';
 
@@ -18,7 +18,7 @@ function App() {
     return <WelcomePage onStart={() => setScreen('registration')} />;
   }
 
-  return <RegistrationMobilePage />;
+  return <RegistrationPage />;
 }
 
 export default App;
