@@ -3,6 +3,53 @@ import { readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const CACHE_NAME = 'as-simba-v1';
+const ICON_DIR = join(process.cwd(), 'public/img/appiconset');
+
+const MANIFEST_BASE = {
+  name: 'AS Simba - Inscription Supporter',
+  short_name: 'AS Simba',
+  description: 'Inscription et engagement supporter AS Simba',
+  start_url: '/',
+  scope: '/',
+  display: 'standalone',
+  orientation: 'portrait',
+  lang: 'fr',
+  theme_color: '#1c1412',
+  background_color: '#1c1412',
+  categories: ['sports', 'lifestyle'],
+};
+
+function buildManifestIcons() {
+  return readdirSync(ICON_DIR)
+    .filter((file) => /^\d+\.png$/.test(file))
+    .sort((a, b) => Number(a.replace('.png', '')) - Number(b.replace('.png', '')))
+    .flatMap((file) => {
+      const size = file.replace('.png', '');
+      const icon = {
+        src: `/img/appiconset/${file}`,
+        sizes: `${size}x${size}`,
+        type: 'image/png',
+      };
+
+      const entries = [{ ...icon, purpose: 'any' }];
+      if (size === '512' || size === '1024') {
+        entries.push({ ...icon, purpose: 'maskable' });
+      }
+
+      return entries;
+    });
+}
+
+function buildManifest() {
+  return JSON.stringify(
+    {
+      ...MANIFEST_BASE,
+      icons: buildManifestIcons(),
+    },
+    null,
+    2,
+  );
+}
 
 function collectDistFiles(dir: string, base: string): string[] {
   const files: string[] = [];
@@ -28,9 +75,21 @@ function collectDistFiles(dir: string, base: string): string[] {
 export function asSimbaPwaPlugin(): Plugin {
   return {
     name: 'as-simba-pwa',
-    apply: 'build',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.split('?')[0] === '/manifest.webmanifest') {
+          res.setHeader('Content-Type', 'application/manifest+json');
+          res.end(buildManifest());
+          return;
+        }
+
+        next();
+      });
+    },
     closeBundle() {
       const outDir = join(process.cwd(), 'dist');
+      writeFileSync(join(outDir, 'manifest.webmanifest'), buildManifest());
+
       const precache = collectDistFiles(outDir, outDir);
 
       const serviceWorker = `const CACHE = ${JSON.stringify(CACHE_NAME)};
