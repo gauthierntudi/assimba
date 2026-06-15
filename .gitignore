@@ -24,3 +24,6 @@ server/node_modules/.prisma
 
 # Vite
 client/dist
+
+# Vercel API bundle (generated at build)
+client/api/server-dist

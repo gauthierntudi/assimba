@@ -1,9 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "npm run vercel-build --prefix ..",
-  "outputDirectory": "dist",
-  "installCommand": "npm install --prefix .. --include=dev",
+  "installCommand": "npm install --include=dev",
+  "buildCommand": "npm run vercel-build",
   "framework": null,
   "functions": {
     "api/index.ts": {
@@ -17,8 +16,12 @@
       "destination": "/api"
     },
     {
+      "source": "/assets/(.*)",
+      "destination": "/client/dist/assets/$1"
+    },
+    {
       "source": "/((?!api/|assets/|img/|vendor/|sw\\.js|workbox-|manifest\\.webmanifest|registerSW\\.js).*)",
-      "destination": "/index.html"
+      "destination": "/client/dist/index.html"
     }
   ],
   "headers": [
