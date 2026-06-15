@@ -7,19 +7,21 @@
     "server"
   ],
   "scripts": {
-    "postinstall": "prisma generate",
+    "postinstall": "npx prisma generate",
     "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
     "dev:client": "npm run dev -w client",
     "dev:server": "npm run dev -w server",
     "build": "npm run build -w client && npm run build -w server",
-    "vercel-build": "prisma generate && npm run build -w server && npm run build -w client",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "vercel-build": "npx prisma generate && npm run build -w server && npm run build -w client",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:migrate": "npx prisma migrate dev",
+    "db:studio": "npx prisma studio"
+  },
+  "dependencies": {
+    "prisma": "^6.5.0"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2",
-    "prisma": "^6.5.0"
+    "concurrently": "^9.1.2"
   }
 }
