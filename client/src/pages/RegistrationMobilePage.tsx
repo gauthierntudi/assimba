@@ -46,7 +46,6 @@ export function RegistrationMobilePage() {
   const [stepFive, setStepFive] = useState(initialStepFiveForm);
   const [paymentResult, setPaymentResult] = useState<PaymentResultData | null>(null);
   const [loading, setLoading] = useState<{ title: string; description: string } | null>(null);
-  const [draftNotice, setDraftNotice] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollCancelledRef = useRef(false);
   const phoneCheckRef = useRef('');
@@ -94,14 +93,13 @@ export function RegistrationMobilePage() {
 
   const verifyPhoneAndRestoreDraft = async (
     phone: string,
-    options: { showNotice?: boolean } = {},
   ): Promise<'new' | 'restored' | 'paid' | 'error'> => {
     if (!phone || !isValidFlexpayDrcPhone(phone)) {
       return 'new';
     }
 
     if (phoneCheckRef.current === phone) {
-      return draftNotice ? 'restored' : 'new';
+      return 'new';
     }
 
     try {
@@ -109,7 +107,6 @@ export function RegistrationMobilePage() {
       phoneCheckRef.current = phone;
 
       if (result.success && result.exists && result.is_paid) {
-        setDraftNotice(null);
         setPaymentResult({
           status: 'failed',
           message: result.message,
@@ -119,15 +116,9 @@ export function RegistrationMobilePage() {
 
       if (result.success && result.exists && result.data) {
         applyDraftPatch(result.data);
-        if (options.showNotice !== false) {
-          setDraftNotice(
-            'Inscription en cours retrouvée. Vos informations ont été chargées, vous pouvez continuer.',
-          );
-        }
         return 'restored';
       }
 
-      setDraftNotice(null);
       return 'new';
     } catch {
       return 'error';
@@ -290,28 +281,13 @@ export function RegistrationMobilePage() {
     });
 
     try {
-      const status = await verifyPhoneAndRestoreDraft(stepOne.phone, { showNotice: true });
+      const status = await verifyPhoneAndRestoreDraft(stepOne.phone);
       if (status === 'paid') {
         return;
       }
 
       await saveDraftQuietly();
       setCurrentStep((step) => Math.min(step + 1, 6));
-    } finally {
-      setLoading(null);
-    }
-  };
-
-  const handlePhoneBlur = async () => {
-    if (isBusy || !stepOne.phone) return;
-
-    setLoading({
-      title: 'Vérification...',
-      description: 'Recherche d\'une inscription en cours avec ce numéro.',
-    });
-
-    try {
-      await verifyPhoneAndRestoreDraft(stepOne.phone, { showNotice: true });
     } finally {
       setLoading(null);
     }
@@ -367,13 +343,10 @@ export function RegistrationMobilePage() {
             onChange={(patch) => {
               if (patch.phone !== undefined && patch.phone !== stepOne.phone) {
                 phoneCheckRef.current = '';
-                setDraftNotice(null);
               }
               setStepOne((prev) => ({ ...prev, ...patch }));
             }}
             onNext={handleIdentityNext}
-            onPhoneBlur={handlePhoneBlur}
-            draftNotice={draftNotice}
           />
         );
     }
