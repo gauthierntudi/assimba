@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -11,6 +11,7 @@ for (const candidate of [
   path.join(here, '../node_modules/.prisma/client', engineName),
 ]) {
   if (existsSync(candidate)) {
+    readFileSync(candidate);
     process.env.PRISMA_QUERY_ENGINE_LIBRARY = candidate;
     break;
   }

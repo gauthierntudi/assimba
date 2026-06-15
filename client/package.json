@@ -6,7 +6,7 @@
   "scripts": {
     "vercel-build": "npm run build",
     "dev": "vite",
-    "build": "npm --prefix .. run build -w server && node ../scripts/bundle-api.mjs && tsc -b && vite build",
+    "build": "npm --prefix .. run build -w server && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
