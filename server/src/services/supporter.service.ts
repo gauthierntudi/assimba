@@ -68,6 +68,7 @@ export async function checkPhone(phone: string) {
       exists: true as const,
       is_paid: true as const,
       message: 'Ce numéro est déjà enregistré avec un paiement réussi.',
+      member_number: supporter.memberNumber,
     };
   }
 

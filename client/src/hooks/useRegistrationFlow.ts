@@ -30,6 +30,8 @@ export function useRegistrationFlow() {
   const [stepFour, setStepFour] = useState(initialStepFourForm);
   const [stepFive, setStepFive] = useState(initialStepFiveForm);
   const [paymentResult, setPaymentResult] = useState<PaymentResultData | null>(null);
+  const [profileNotice, setProfileNotice] = useState<string | null>(null);
+  const [profileReviewed, setProfileReviewed] = useState(false);
   const [loading, setLoading] = useState<{ title: string; description: string } | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollCancelledRef = useRef(false);
@@ -99,8 +101,12 @@ export function useRegistrationFlow() {
 
       if (result.success && result.exists && 'is_paid' in result && result.is_paid) {
         setPaymentResult({
-          status: 'failed',
-          message: result.message,
+          status: 'success',
+          memberNumber: result.member_number ?? undefined,
+          message:
+            result.member_number != null
+              ? 'Vous êtes déjà inscrit. Conservez votre numéro de membre ci-dessous.'
+              : result.message,
         });
         return { status: 'paid' };
       }
@@ -260,6 +266,23 @@ export function useRegistrationFlow() {
 
     const forms = getCurrentForms();
 
+    if (profileReviewed) {
+      setLoading({
+        title: 'Chargement...',
+        description: 'Sauvegarde de vos informations en cours.',
+      });
+
+      try {
+        await saveDraftQuietly(forms);
+        setProfileNotice(null);
+        setProfileReviewed(false);
+        setCurrentStep(3);
+      } finally {
+        setLoading(null);
+      }
+      return;
+    }
+
     setLoading({
       title: 'Vérification...',
       description: 'Vérification de votre numéro de téléphone.',
@@ -281,23 +304,23 @@ export function useRegistrationFlow() {
         return;
       }
 
-      const nextForms = result.status === 'restored' ? result.forms : forms;
-
       if (result.status === 'restored') {
-        setLoading({
-          title: 'Chargement...',
-          description: 'Reprise de votre inscription en cours.',
-        });
-      } else {
-        setLoading({
-          title: 'Chargement...',
-          description: 'Sauvegarde de vos informations en cours.',
-        });
+        applyForms(result.forms);
+        await saveDraftQuietly(result.forms);
+        setProfileReviewed(true);
+        setProfileNotice(
+          'Nous avons retrouvé vos informations. Vous pouvez les modifier, puis continuer.',
+        );
+        return;
       }
 
-      applyForms(nextForms);
-      await saveDraftQuietly(nextForms);
-      setCurrentStep((step) => Math.min(step + 1, 6));
+      setLoading({
+        title: 'Chargement...',
+        description: 'Sauvegarde de vos informations en cours.',
+      });
+
+      await saveDraftQuietly(forms);
+      setCurrentStep(3);
     } finally {
       setLoading((current) =>
         current?.title === 'API indisponible' ? current : null,
@@ -312,6 +335,10 @@ export function useRegistrationFlow() {
   };
 
   const handleStepOneChange = (patch: Partial<typeof stepOne>) => {
+    if (patch.phone && patch.phone !== stepOne.phone) {
+      setProfileReviewed(false);
+      setProfileNotice(null);
+    }
     setStepOne((prev) => ({ ...prev, ...patch }));
   };
 
@@ -327,6 +354,7 @@ export function useRegistrationFlow() {
     setStepFour,
     setStepFive,
     paymentResult,
+    profileNotice,
     loading,
     isBusy,
     showPrevNext,

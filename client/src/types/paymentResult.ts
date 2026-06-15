@@ -3,6 +3,7 @@ export type PaymentResultStatus = 'success' | 'failed';
 export type PaymentResultData = {
   status: PaymentResultStatus;
   orderNumber?: string;
+  memberNumber?: string;
   message?: string;
   cardDownloadUrl?: string;
 };

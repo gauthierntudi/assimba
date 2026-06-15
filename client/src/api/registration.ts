@@ -11,7 +11,7 @@ import type {
 
 export type CheckPhoneResponse =
   | { success: true; exists: false }
-  | { success: true; exists: true; is_paid: true; message: string }
+  | { success: true; exists: true; is_paid: true; message: string; member_number?: string | null }
   | { success: true; exists: true; is_paid: false; data: Record<string, unknown> }
   | { success: false; message: string };
 
@@ -95,6 +95,22 @@ export type RegistrationForms = {
   stepFive: StepFiveForm;
 };
 
+function isBlank(value: unknown): boolean {
+  if (value == null) return true;
+  if (typeof value === 'string') return value.trim() === '';
+  return false;
+}
+
+function preferUserText(userValue: string, dbValue: unknown): string {
+  if (!isBlank(userValue)) return userValue.trim();
+  if (isBlank(dbValue)) return userValue;
+  return String(dbValue).trim();
+}
+
+function preferUserBool(userValue: boolean, dbValue: boolean): boolean {
+  return userValue || dbValue;
+}
+
 export function mergeDraftIntoForms(
   forms: RegistrationForms,
   data: Record<string, unknown>,
@@ -102,11 +118,47 @@ export function mergeDraftIntoForms(
   const patch = mapDraftToFormPatch(data);
 
   return {
-    stepOne: { ...forms.stepOne, ...patch.stepOne },
-    stepTwo: { ...forms.stepTwo, ...patch.stepTwo },
-    stepThree: { ...forms.stepThree, ...patch.stepThree },
-    stepFour: { ...forms.stepFour, ...patch.stepFour },
-    stepFive: { ...forms.stepFive, ...patch.stepFive },
+    stepOne: {
+      ...forms.stepOne,
+      firstname: preferUserText(forms.stepOne.firstname, data.firstname),
+      lastname: preferUserText(forms.stepOne.lastname, data.lastname),
+      postname: preferUserText(forms.stepOne.postname, data.middlename),
+      gender: (preferUserText(forms.stepOne.gender, data.gender) ||
+        '') as StepOneForm['gender'],
+      ageRange: preferUserText(forms.stepOne.ageRange, data.age_range ?? data.age),
+      phone: forms.stepOne.phone,
+    },
+    stepTwo: {
+      ...forms.stepTwo,
+      countryStatus: (preferUserText(forms.stepTwo.countryStatus, data.country_status) ||
+        'RDC') as StepTwoForm['countryStatus'],
+      province: preferUserText(forms.stepTwo.province, data.province),
+      city: preferUserText(forms.stepTwo.city, data.city),
+      town: preferUserText(forms.stepTwo.town, data.town),
+      socialFb: preferUserBool(forms.stepTwo.socialFb, patch.stepTwo.socialFb ?? false),
+      socialX: preferUserBool(forms.stepTwo.socialX, patch.stepTwo.socialX ?? false),
+      socialIg: preferUserBool(forms.stepTwo.socialIg, patch.stepTwo.socialIg ?? false),
+      socialTt: preferUserBool(forms.stepTwo.socialTt, patch.stepTwo.socialTt ?? false),
+    },
+    stepThree: {
+      ...forms.stepThree,
+      occupation: preferUserText(forms.stepThree.occupation, data.occupation),
+      contribution: preferUserText(forms.stepThree.contribution, data.contribution),
+      merchBudget: preferUserText(forms.stepThree.merchBudget, data.merch),
+    },
+    stepFour: {
+      ...forms.stepFour,
+      section: preferUserText(forms.stepFour.section, data.section),
+      years: preferUserText(forms.stepFour.years, data.years),
+      trainingFreq: preferUserText(forms.stepFour.trainingFreq, data.training_freq),
+      matchFreq: preferUserText(forms.stepFour.matchFreq, data.match_freq),
+      followMethod: preferUserText(forms.stepFour.followMethod, data.follow_method),
+    },
+    stepFive: {
+      ...forms.stepFive,
+      memberType:
+        (patch.stepFive.memberType as MemberType) || forms.stepFive.memberType || 'simple',
+    },
   };
 }
 
