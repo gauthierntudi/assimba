@@ -7,7 +7,9 @@ const monorepoRoot = path.resolve(
   '../../..',
 );
 
-dotenv.config({ path: path.join(monorepoRoot, '.env') });
+if (!process.env.VERCEL) {
+  dotenv.config({ path: path.join(monorepoRoot, '.env') });
+}
 
 function vercelProductionUrl(): string | undefined {
   const vercelUrl = process.env.VERCEL_URL?.trim();
