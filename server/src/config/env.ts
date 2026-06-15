@@ -9,6 +9,11 @@ const monorepoRoot = path.resolve(
 
 dotenv.config({ path: path.join(monorepoRoot, '.env') });
 
+function vercelProductionUrl(): string | undefined {
+  const vercelUrl = process.env.VERCEL_URL?.trim();
+  return vercelUrl ? `https://${vercelUrl}` : undefined;
+}
+
 function normalizeFlexpayToken(value: string | undefined): string {
   const raw = (value ?? '').trim().replace(/^['"]|['"]$/g, '');
   if (!raw) return '';
@@ -18,8 +23,14 @@ function normalizeFlexpayToken(value: string | undefined): string {
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: Number(process.env.PORT ?? 4000),
-  appUrl: (process.env.APP_URL ?? 'http://localhost:4000').replace(/\/$/, ''),
-  webUrl: (process.env.WEB_URL ?? 'http://localhost:5173').replace(/\/$/, ''),
+  appUrl: (process.env.APP_URL ?? vercelProductionUrl() ?? 'http://localhost:4000').replace(
+    /\/$/,
+    '',
+  ),
+  webUrl: (process.env.WEB_URL ?? vercelProductionUrl() ?? 'http://localhost:5173').replace(
+    /\/$/,
+    '',
+  ),
   databaseUrl: process.env.DATABASE_URL,
   flexpay: {
     merchant: process.env.FLEXPAY_MERCHANT ?? process.env.marchand ?? 'ISSIFORUM',
