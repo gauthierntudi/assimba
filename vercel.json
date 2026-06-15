@@ -5,19 +5,15 @@
   "buildCommand": "npm run vercel-build",
   "framework": null,
   "functions": {
-    "api/index.ts": {
+    "api/**/*.ts": {
       "maxDuration": 30,
-      "includeFiles": "api/**"
+      "includeFiles": "api/prisma-engine.so"
     }
   },
   "rewrites": [
     {
       "source": "/favicon.ico",
       "destination": "/img/appiconset/32.png"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api"
     },
     {
       "source": "/assets/(.*)",

@@ -4,20 +4,10 @@
   "installCommand": "npm install --prefix .. --include=dev",
   "buildCommand": "npm run build",
   "framework": "vite",
-  "functions": {
-    "api/index.ts": {
-      "maxDuration": 30,
-      "includeFiles": "api/**"
-    }
-  },
   "rewrites": [
     {
       "source": "/favicon.ico",
       "destination": "/img/appiconset/32.png"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api"
     },
     {
       "source": "/((?!api/|assets/|img/|vendor/|sw\\.js|workbox-|manifest\\.webmanifest|registerSW\\.js).*)",
