@@ -22,7 +22,6 @@
     "db:studio": "npm run db:studio -w server"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2",
-    "esbuild": "^0.25.0"
+    "concurrently": "^9.1.2"
   }
 }
