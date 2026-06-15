@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "vercel-build": "npm run build",
     "dev": "vite",
     "build": "npm --prefix .. run build -w server && node ../scripts/prepare-api.mjs && tsc -b && vite build",
     "lint": "eslint .",
