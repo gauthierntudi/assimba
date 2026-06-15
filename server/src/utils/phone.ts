@@ -30,3 +30,18 @@ export function toFlexpayPhone(phone: string): string {
 export function isValidFlexpayDrcPhone(phone: string): boolean {
   return /^243\d{9}$/.test(toFlexpayPhone(phone));
 }
+
+/** Variantes possibles d'un même numéro (legacy + formats saisis). */
+export function phoneLookupVariants(phone: string): string[] {
+  const trimmed = phone.trim();
+  if (!trimmed) return [];
+
+  const flex = toFlexpayPhone(trimmed);
+  const local = flex.length === 12 ? `0${flex.slice(3)}` : trimmed;
+
+  return [...new Set([trimmed, flex, `+${flex}`, local])].filter(Boolean);
+}
+
+export function normalizeStoragePhone(phone: string): string {
+  return toFlexpayPhone(phone);
+}

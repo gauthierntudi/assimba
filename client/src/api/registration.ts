@@ -1,6 +1,7 @@
 import { api } from './client';
 import { toFlexpayPhone } from '../utils/phone';
 import type {
+  MemberType,
   StepFiveForm,
   StepFourForm,
   StepOneForm,
@@ -33,8 +34,53 @@ export type PaymentStatusResponse =
   | { success: true; status: 'paid' | 'pending' | 'failed'; message?: string }
   | { success: false; message: string };
 
+export type DraftFormPatch = {
+  stepOne: Partial<StepOneForm>;
+  stepTwo: Partial<StepTwoForm>;
+  stepThree: Partial<StepThreeForm>;
+  stepFour: Partial<StepFourForm>;
+  stepFive: Partial<StepFiveForm>;
+};
+
 function socialFlag(value: boolean): string {
   return value ? '1' : '';
+}
+
+export function mapDraftToFormPatch(data: Record<string, unknown>): DraftFormPatch {
+  return {
+    stepOne: {
+      firstname: String(data.firstname ?? ''),
+      lastname: String(data.lastname ?? ''),
+      postname: String(data.middlename ?? ''),
+      gender: (data.gender as StepOneForm['gender']) || '',
+      ageRange: String(data.age_range ?? data.age ?? ''),
+    },
+    stepTwo: {
+      countryStatus: (data.country_status as StepTwoForm['countryStatus']) || 'RDC',
+      province: String(data.province ?? ''),
+      city: String(data.city ?? ''),
+      town: String(data.town ?? ''),
+      socialFb: data.social_fb === '1',
+      socialX: data.social_x === '1',
+      socialIg: data.social_ig === '1',
+      socialTt: data.social_tt === '1',
+    },
+    stepThree: {
+      occupation: String(data.occupation ?? ''),
+      contribution: String(data.contribution ?? ''),
+      merchBudget: String(data.merch ?? ''),
+    },
+    stepFour: {
+      section: String(data.section ?? ''),
+      years: data.years != null ? String(data.years) : '',
+      trainingFreq: String(data.training_freq ?? ''),
+      matchFreq: String(data.match_freq ?? ''),
+      followMethod: String(data.follow_method ?? ''),
+    },
+    stepFive: {
+      memberType: (data.member_type as MemberType) || 'simple',
+    },
+  };
 }
 
 export function buildRegistrationPayload(

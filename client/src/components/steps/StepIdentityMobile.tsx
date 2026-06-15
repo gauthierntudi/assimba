@@ -8,6 +8,8 @@ type StepIdentityMobileProps = {
   formId: string;
   onChange: (patch: Partial<StepOneForm>) => void;
   onNext: () => void;
+  onPhoneBlur?: () => void;
+  draftNotice?: string | null;
 };
 
 const AGE_OPTIONS = [
@@ -26,7 +28,14 @@ const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: 'A', label: 'Autre' },
 ];
 
-export function StepIdentityMobile({ form, formId, onChange, onNext }: StepIdentityMobileProps) {
+export function StepIdentityMobile({
+  form,
+  formId,
+  onChange,
+  onNext,
+  onPhoneBlur,
+  draftNotice,
+}: StepIdentityMobileProps) {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     onNext();
@@ -104,10 +113,13 @@ export function StepIdentityMobile({ form, formId, onChange, onNext }: StepIdent
         <SelectChevron className="reg-mobile__field-chevron" />
       </label>
 
+      {draftNotice ? <p className="reg-mobile__draft-notice">{draftNotice}</p> : null}
+
       <PhoneInput
         id="phone"
         value={form.phone}
         onChange={(phone) => onChange({ phone })}
+        onBlur={onPhoneBlur}
         required
       />
     </form>

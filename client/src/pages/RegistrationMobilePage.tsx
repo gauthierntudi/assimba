@@ -4,6 +4,7 @@ import {
   checkPaymentStatus,
   checkPhone,
   createPayment,
+  mapDraftToFormPatch,
   saveDraft,
   submitCardPayment,
 } from '../api/registration';
@@ -45,8 +46,10 @@ export function RegistrationMobilePage() {
   const [stepFive, setStepFive] = useState(initialStepFiveForm);
   const [paymentResult, setPaymentResult] = useState<PaymentResultData | null>(null);
   const [loading, setLoading] = useState<{ title: string; description: string } | null>(null);
+  const [draftNotice, setDraftNotice] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollCancelledRef = useRef(false);
+  const phoneCheckRef = useRef('');
 
   const isBusy = loading !== null;
 
@@ -79,6 +82,57 @@ export function RegistrationMobilePage() {
 
   const buildPayload = () =>
     buildRegistrationPayload(stepOne, stepTwo, stepThree, stepFour, stepFive);
+
+  const applyDraftPatch = (data: Record<string, unknown>) => {
+    const patch = mapDraftToFormPatch(data);
+    setStepOne((prev) => ({ ...prev, ...patch.stepOne }));
+    setStepTwo((prev) => ({ ...prev, ...patch.stepTwo }));
+    setStepThree((prev) => ({ ...prev, ...patch.stepThree }));
+    setStepFour((prev) => ({ ...prev, ...patch.stepFour }));
+    setStepFive((prev) => ({ ...prev, ...patch.stepFive }));
+  };
+
+  const verifyPhoneAndRestoreDraft = async (
+    phone: string,
+    options: { showNotice?: boolean } = {},
+  ): Promise<'new' | 'restored' | 'paid' | 'error'> => {
+    if (!phone || !isValidFlexpayDrcPhone(phone)) {
+      return 'new';
+    }
+
+    if (phoneCheckRef.current === phone) {
+      return draftNotice ? 'restored' : 'new';
+    }
+
+    try {
+      const result = await checkPhone(phone);
+      phoneCheckRef.current = phone;
+
+      if (result.success && result.exists && result.is_paid) {
+        setDraftNotice(null);
+        setPaymentResult({
+          status: 'failed',
+          message: result.message,
+        });
+        return 'paid';
+      }
+
+      if (result.success && result.exists && result.data) {
+        applyDraftPatch(result.data);
+        if (options.showNotice !== false) {
+          setDraftNotice(
+            'Inscription en cours retrouvée. Vos informations ont été chargées, vous pouvez continuer.',
+          );
+        }
+        return 'restored';
+      }
+
+      setDraftNotice(null);
+      return 'new';
+    } catch {
+      return 'error';
+    }
+  };
 
   const saveDraftQuietly = async () => {
     if (!stepOne.phone) return;
@@ -236,62 +290,28 @@ export function RegistrationMobilePage() {
     });
 
     try {
-      if (stepOne.phone) {
-        try {
-          const result = await checkPhone(stepOne.phone);
-
-          if (result.success && result.exists && result.is_paid) {
-            setPaymentResult({
-              status: 'failed',
-              message: result.message,
-            });
-            return;
-          }
-
-          if (result.success && result.exists && result.data) {
-            const data = result.data;
-            setStepOne((prev) => ({
-              ...prev,
-              firstname: String(data.firstname ?? prev.firstname),
-              lastname: String(data.lastname ?? prev.lastname),
-              postname: String(data.middlename ?? prev.postname),
-              gender: (data.gender as typeof prev.gender) || prev.gender,
-              ageRange: String(data.age_range ?? data.age ?? prev.ageRange),
-            }));
-            setStepTwo((prev) => ({
-              ...prev,
-              countryStatus:
-                (data.country_status as typeof prev.countryStatus) || prev.countryStatus,
-              province: String(data.province ?? prev.province),
-              city: String(data.city ?? prev.city),
-              town: String(data.town ?? prev.town),
-              socialFb: data.social_fb === '1' || prev.socialFb,
-              socialX: data.social_x === '1' || prev.socialX,
-              socialIg: data.social_ig === '1' || prev.socialIg,
-              socialTt: data.social_tt === '1' || prev.socialTt,
-            }));
-            setStepThree((prev) => ({
-              ...prev,
-              occupation: String(data.occupation ?? prev.occupation),
-              contribution: String(data.contribution ?? prev.contribution),
-              merchBudget: String(data.merch ?? prev.merchBudget),
-            }));
-            setStepFour((prev) => ({
-              ...prev,
-              section: String(data.section ?? prev.section),
-              years: data.years != null ? String(data.years) : prev.years,
-              trainingFreq: String(data.training_freq ?? prev.trainingFreq),
-              matchFreq: String(data.match_freq ?? prev.matchFreq),
-              followMethod: String(data.follow_method ?? prev.followMethod),
-            }));
-          }
-        } catch {
-          // Ne pas bloquer si le serveur est indisponible
-        }
+      const status = await verifyPhoneAndRestoreDraft(stepOne.phone, { showNotice: true });
+      if (status === 'paid') {
+        return;
       }
 
       await saveDraftQuietly();
       setCurrentStep((step) => Math.min(step + 1, 6));
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handlePhoneBlur = async () => {
+    if (isBusy || !stepOne.phone) return;
+
+    setLoading({
+      title: 'Vérification...',
+      description: 'Recherche d\'une inscription en cours avec ce numéro.',
+    });
+
+    try {
+      await verifyPhoneAndRestoreDraft(stepOne.phone, { showNotice: true });
     } finally {
       setLoading(null);
     }
@@ -344,8 +364,16 @@ export function RegistrationMobilePage() {
           <StepIdentityMobile
             formId={FORM_IDS[2]}
             form={stepOne}
-            onChange={(patch) => setStepOne((prev) => ({ ...prev, ...patch }))}
+            onChange={(patch) => {
+              if (patch.phone !== undefined && patch.phone !== stepOne.phone) {
+                phoneCheckRef.current = '';
+                setDraftNotice(null);
+              }
+              setStepOne((prev) => ({ ...prev, ...patch }));
+            }}
             onNext={handleIdentityNext}
+            onPhoneBlur={handlePhoneBlur}
+            draftNotice={draftNotice}
           />
         );
     }

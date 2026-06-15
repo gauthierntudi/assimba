@@ -231,6 +231,20 @@ body.reg-mobile-active {
   min-width: 0;
 }
 
+.reg-mobile__draft-notice {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+/* ── Fields ── */
+
 .reg-mobile__field {
   position: relative;
   display: block;

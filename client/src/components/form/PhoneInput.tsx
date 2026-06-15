@@ -22,6 +22,7 @@ type PhoneInputProps = {
   id?: string;
   value: string;
   onChange: (phone: string) => void;
+  onBlur?: () => void;
   required?: boolean;
   placeholder?: string;
 };
@@ -30,15 +31,18 @@ export function PhoneInput({
   id = 'phone',
   value,
   onChange,
+  onBlur,
   required,
   placeholder = 'Téléphone',
 }: PhoneInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const itiRef = useRef<ReturnType<typeof intlTelInput> | null>(null);
   const onChangeRef = useRef(onChange);
+  const onBlurRef = useRef(onBlur);
   const lastEmittedRef = useRef('');
 
   onChangeRef.current = onChange;
+  onBlurRef.current = onBlur;
 
   useEffect(() => {
     const input = inputRef.current;
@@ -54,8 +58,13 @@ export function PhoneInput({
       onChangeRef.current(number);
     };
 
+    const handleBlur = () => {
+      onBlurRef.current?.();
+    };
+
     input.addEventListener('input', emitChange);
     input.addEventListener('countrychange', emitChange);
+    input.addEventListener('blur', handleBlur);
 
     iti.promise.then(() => {
       if (value) {
@@ -67,6 +76,7 @@ export function PhoneInput({
     return () => {
       input.removeEventListener('input', emitChange);
       input.removeEventListener('countrychange', emitChange);
+      input.removeEventListener('blur', handleBlur);
       iti.destroy();
       itiRef.current = null;
     };

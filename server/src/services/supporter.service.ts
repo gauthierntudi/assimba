@@ -5,23 +5,31 @@ import {
   toSupporterData,
   type SupporterInput,
 } from '../utils/payload.js';
+import { normalizeStoragePhone, phoneLookupVariants } from '../utils/phone.js';
 
 export async function upsertSupporter(
   input: SupporterInput,
   options: { includeMemberType?: boolean } = {},
 ): Promise<number> {
   const includeMemberType = options.includeMemberType ?? false;
-  const existing = await prisma.supporter.findUnique({
-    where: { phone: input.phone },
+  const normalizedPhone = normalizeStoragePhone(input.phone);
+  const existing = await prisma.supporter.findFirst({
+    where: { phone: { in: phoneLookupVariants(input.phone) } },
     select: { id: true },
   });
 
-  const data = toSupporterData(input, includeMemberType) as Prisma.SupporterUpdateInput;
+  const data = toSupporterData(
+    { ...input, phone: normalizedPhone },
+    includeMemberType,
+  ) as Prisma.SupporterUpdateInput;
 
   if (existing) {
     await prisma.supporter.update({
       where: { id: existing.id },
-      data,
+      data: {
+        ...data,
+        phone: normalizedPhone,
+      },
     });
     return existing.id;
   }
@@ -29,7 +37,7 @@ export async function upsertSupporter(
   const created = await prisma.supporter.create({
     data: {
       ...(data as Prisma.SupporterCreateInput),
-      phone: input.phone,
+      phone: normalizedPhone,
     },
   });
 
@@ -41,8 +49,8 @@ export function parseBodyToSupporter(body: Record<string, unknown>): SupporterIn
 }
 
 export async function checkPhone(phone: string) {
-  const supporter = await prisma.supporter.findUnique({
-    where: { phone },
+  const supporter = await prisma.supporter.findFirst({
+    where: { phone: { in: phoneLookupVariants(phone) } },
   });
 
   if (!supporter) {
@@ -93,6 +101,7 @@ export async function checkPhone(phone: string) {
       social_x: supporter.socialX,
       social_ig: supporter.socialIg,
       social_tt: supporter.socialTt,
+      member_type: supporter.memberType,
     },
   };
 }
