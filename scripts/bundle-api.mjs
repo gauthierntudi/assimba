@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,6 +12,7 @@ const prismaEngine = path.join(
   apiNodeModules,
   '.prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node',
 );
+const prismaEngineCopy = path.join(apiDir, 'prisma-engine.so');
 
 if (!existsSync(path.join(serverDist, 'app.js'))) {
   throw new Error(`Missing server build at ${serverDist}. Run "npm run build -w server" first.`);
@@ -19,6 +20,7 @@ if (!existsSync(path.join(serverDist, 'app.js'))) {
 
 rmSync(apiServerDist, { recursive: true, force: true });
 rmSync(apiNodeModules, { recursive: true, force: true });
+rmSync(prismaEngineCopy, { force: true });
 
 mkdirSync(apiDir, { recursive: true });
 cpSync(serverDist, apiServerDist, { recursive: true });
@@ -33,7 +35,7 @@ function copyPackage(name) {
   cpSync(src, dest, { recursive: true });
 }
 
-for (const pkg of ['@prisma/client', '.prisma']) {
+for (const pkg of ['@prisma/client', '.prisma', 'express', 'cors']) {
   copyPackage(pkg);
 }
 
@@ -41,6 +43,8 @@ if (!existsSync(prismaEngine)) {
   throw new Error(`Missing Prisma Linux engine at ${prismaEngine}`);
 }
 
+copyFileSync(prismaEngine, prismaEngineCopy);
+
 console.log(`Prepared API at ${apiDir}`);
 console.log(`Server dist: ${apiServerDist}`);
-console.log(`Prisma engine: ${prismaEngine}`);
+console.log(`Prisma engine: ${prismaEngineCopy}`);

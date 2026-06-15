@@ -28,3 +28,4 @@ client/dist
 # Vercel API artifacts (generated at build)
 client/api/server-dist/
 client/api/node_modules/
+client/api/prisma-engine.so
