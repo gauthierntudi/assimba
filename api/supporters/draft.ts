@@ -2,7 +2,7 @@ import '../_lib/setup.js';
 import {
   parseBodyToSupporter,
   upsertSupporter,
-} from '../../server/dist/services/supporter.service.js';
+} from '../_dist/services/supporter.service.js';
 import { bodyRecord, methodNotAllowed, type ApiRequest, type ApiResponse } from '../_lib/http.js';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {

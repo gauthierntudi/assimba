@@ -26,6 +26,7 @@ server/node_modules/.prisma
 client/dist
 
 api/prisma-engine.so
+api/_dist/
 client/api/server-dist/
 client/api/node_modules/
 client/api/prisma-engine.so

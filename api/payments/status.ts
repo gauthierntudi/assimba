@@ -1,5 +1,5 @@
 import '../_lib/setup.js';
-import { checkPaymentStatus } from '../../server/dist/services/flexpay.service.js';
+import { checkPaymentStatus } from '../_dist/services/flexpay.service.js';
 import { methodNotAllowed, queryString, type ApiRequest, type ApiResponse } from '../_lib/http.js';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
