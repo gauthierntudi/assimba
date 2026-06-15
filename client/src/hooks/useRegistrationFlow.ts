@@ -30,8 +30,6 @@ export function useRegistrationFlow() {
   const [stepFour, setStepFour] = useState(initialStepFourForm);
   const [stepFive, setStepFive] = useState(initialStepFiveForm);
   const [paymentResult, setPaymentResult] = useState<PaymentResultData | null>(null);
-  const [profileNotice, setProfileNotice] = useState<string | null>(null);
-  const [profileReviewed, setProfileReviewed] = useState(false);
   const [identityPhoneError, setIdentityPhoneError] = useState<string | null>(null);
   const [loading, setLoading] = useState<{ title: string; description: string } | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -262,23 +260,6 @@ export function useRegistrationFlow() {
 
     const forms = getCurrentForms();
 
-    if (profileReviewed) {
-      setLoading({
-        title: 'Chargement...',
-        description: 'Sauvegarde de vos informations en cours.',
-      });
-
-      try {
-        await saveDraftQuietly(forms);
-        setProfileNotice(null);
-        setProfileReviewed(false);
-        setCurrentStep(3);
-      } finally {
-        setLoading(null);
-      }
-      return;
-    }
-
     setLoading({
       title: 'Vérification...',
       description: 'Vérification de votre numéro de téléphone.',
@@ -288,8 +269,6 @@ export function useRegistrationFlow() {
       const result = await verifyPhoneAndRestoreDraft(forms.stepOne.phone, forms);
 
       if (result.status === 'paid') {
-        setProfileNotice(null);
-        setProfileReviewed(false);
         setIdentityPhoneError(result.message);
         return;
       }
@@ -303,16 +282,7 @@ export function useRegistrationFlow() {
         return;
       }
 
-      if (result.status === 'restored') {
-        setIdentityPhoneError(null);
-        applyForms(result.forms);
-        await saveDraftQuietly(result.forms);
-        setProfileReviewed(true);
-        setProfileNotice(
-          'Nous avons retrouvé vos informations. Vous pouvez les modifier, puis continuer.',
-        );
-        return;
-      }
+      const nextForms = result.status === 'restored' ? result.forms : forms;
 
       setLoading({
         title: 'Chargement...',
@@ -320,7 +290,8 @@ export function useRegistrationFlow() {
       });
 
       setIdentityPhoneError(null);
-      await saveDraftQuietly(forms);
+      applyForms(nextForms);
+      await saveDraftQuietly(nextForms);
       setCurrentStep(3);
     } finally {
       setLoading((current) =>
@@ -337,8 +308,6 @@ export function useRegistrationFlow() {
 
   const handleStepOneChange = (patch: Partial<typeof stepOne>) => {
     if (patch.phone && patch.phone !== stepOne.phone) {
-      setProfileReviewed(false);
-      setProfileNotice(null);
       setIdentityPhoneError(null);
     }
     setStepOne((prev) => ({ ...prev, ...patch }));
@@ -356,7 +325,6 @@ export function useRegistrationFlow() {
     setStepFour,
     setStepFive,
     paymentResult,
-    profileNotice,
     identityPhoneError,
     loading,
     isBusy,

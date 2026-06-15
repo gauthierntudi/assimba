@@ -18,7 +18,6 @@ type RegistrationStepFormProps = Pick<
   | 'handleIdentityNext'
   | 'handleRegister'
   | 'handleStepOneChange'
-  | 'profileNotice'
   | 'identityPhoneError'
   | 'setStepTwo'
   | 'setStepThree'
@@ -37,7 +36,6 @@ export function RegistrationStepForm({
   handleIdentityNext,
   handleRegister,
   handleStepOneChange,
-  profileNotice,
   identityPhoneError,
   setStepTwo,
   setStepThree,
@@ -86,7 +84,6 @@ export function RegistrationStepForm({
         <StepIdentityMobile
           formId={FORM_IDS[2]}
           form={stepOne}
-          notice={profileNotice}
           error={identityPhoneError}
           onChange={handleStepOneChange}
           onNext={handleIdentityNext}
