@@ -76,7 +76,7 @@ export async function initiatePayment(body: Record<string, unknown>) {
   if (existingInvoice?.status === 'paid') {
     return {
       success: false as const,
-      message: 'Ce numéro est déjà enregistré avec un paiement réussi.',
+      message: 'Ce numéro est déjà utilisé.',
     };
   }
 

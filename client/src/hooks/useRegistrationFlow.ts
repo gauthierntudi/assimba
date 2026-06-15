@@ -32,6 +32,7 @@ export function useRegistrationFlow() {
   const [paymentResult, setPaymentResult] = useState<PaymentResultData | null>(null);
   const [profileNotice, setProfileNotice] = useState<string | null>(null);
   const [profileReviewed, setProfileReviewed] = useState(false);
+  const [identityPhoneError, setIdentityPhoneError] = useState<string | null>(null);
   const [loading, setLoading] = useState<{ title: string; description: string } | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pollCancelledRef = useRef(false);
@@ -89,7 +90,7 @@ export function useRegistrationFlow() {
   ): Promise<
     | { status: 'new' }
     | { status: 'restored'; forms: RegistrationForms }
-    | { status: 'paid' }
+    | { status: 'paid'; message: string }
     | { status: 'error' }
   > => {
     if (!phone || !isValidFlexpayDrcPhone(phone)) {
@@ -100,15 +101,10 @@ export function useRegistrationFlow() {
       const result = await checkPhone(phone);
 
       if (result.success && result.exists && 'is_paid' in result && result.is_paid) {
-        setPaymentResult({
-          status: 'success',
-          memberNumber: result.member_number ?? undefined,
-          message:
-            result.member_number != null
-              ? 'Vous êtes déjà inscrit. Conservez votre numéro de membre ci-dessous.'
-              : result.message,
-        });
-        return { status: 'paid' };
+        return {
+          status: 'paid',
+          message: result.message || 'Ce numéro est déjà utilisé.',
+        };
       }
 
       if (result.success && result.exists && 'data' in result && result.data) {
@@ -292,6 +288,9 @@ export function useRegistrationFlow() {
       const result = await verifyPhoneAndRestoreDraft(forms.stepOne.phone, forms);
 
       if (result.status === 'paid') {
+        setProfileNotice(null);
+        setProfileReviewed(false);
+        setIdentityPhoneError(result.message);
         return;
       }
 
@@ -305,6 +304,7 @@ export function useRegistrationFlow() {
       }
 
       if (result.status === 'restored') {
+        setIdentityPhoneError(null);
         applyForms(result.forms);
         await saveDraftQuietly(result.forms);
         setProfileReviewed(true);
@@ -319,6 +319,7 @@ export function useRegistrationFlow() {
         description: 'Sauvegarde de vos informations en cours.',
       });
 
+      setIdentityPhoneError(null);
       await saveDraftQuietly(forms);
       setCurrentStep(3);
     } finally {
@@ -338,6 +339,7 @@ export function useRegistrationFlow() {
     if (patch.phone && patch.phone !== stepOne.phone) {
       setProfileReviewed(false);
       setProfileNotice(null);
+      setIdentityPhoneError(null);
     }
     setStepOne((prev) => ({ ...prev, ...patch }));
   };
@@ -355,6 +357,7 @@ export function useRegistrationFlow() {
     setStepFive,
     paymentResult,
     profileNotice,
+    identityPhoneError,
     loading,
     isBusy,
     showPrevNext,

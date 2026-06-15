@@ -7,6 +7,7 @@ type StepIdentityMobileProps = {
   form: StepOneForm;
   formId: string;
   notice?: string | null;
+  error?: string | null;
   onChange: (patch: Partial<StepOneForm>) => void;
   onNext: () => void;
 };
@@ -31,6 +32,7 @@ export function StepIdentityMobile({
   form,
   formId,
   notice,
+  error,
   onChange,
   onNext,
 }: StepIdentityMobileProps) {
@@ -41,6 +43,11 @@ export function StepIdentityMobile({
 
   return (
     <form id={formId} className="reg-mobile__form" onSubmit={handleSubmit}>
+      {error ? (
+        <p className="reg-mobile__draft-notice reg-mobile__draft-notice--error" role="alert">
+          {error}
+        </p>
+      ) : null}
       {notice ? <p className="reg-mobile__draft-notice">{notice}</p> : null}
 
       <label className="reg-mobile__field">

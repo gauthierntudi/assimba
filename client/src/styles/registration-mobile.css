@@ -229,6 +229,13 @@ body.reg-mobile-active {
   text-align: left;
 }
 
+.reg-mobile__draft-notice--error {
+  background: rgba(255, 72, 72, 0.18);
+  border-color: rgba(255, 140, 140, 0.55);
+  color: #fff;
+}
+
+
 /* ── Fields ── */
 
 .reg-mobile__field {
