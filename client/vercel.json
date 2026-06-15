@@ -5,9 +5,9 @@
   "buildCommand": "npm run build",
   "framework": "vite",
   "functions": {
-    "api/index.ts": {
+    "api/index.js": {
       "maxDuration": 30,
-      "includeFiles": "{api/server-dist/**,api/node_modules/**}"
+      "includeFiles": "api/node_modules/**"
     }
   },
   "rewrites": [
