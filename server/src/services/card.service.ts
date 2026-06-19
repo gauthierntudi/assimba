@@ -118,7 +118,7 @@ function buildCardSvg(
       const raw = values[key as keyof typeof values] ?? '';
       const text = escapeXml(truncate(raw, field.maxChars).toUpperCase());
 
-      return `<text x="${field.x}" y="${field.y}" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="${field.size}" font-weight="700" fill="${field.color}">${text}</text>`;
+      return `<text x="${field.x}" y="${field.y}" dominant-baseline="middle" font-family="Roboto, sans-serif" font-size="${field.size}" font-weight="700" fill="${field.color}">${text}</text>`;
     })
     .join('');
 

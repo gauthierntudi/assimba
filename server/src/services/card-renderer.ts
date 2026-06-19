@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 
 let resvgInitPromise: Promise<void> | null = null;
+let cardFontPromise: Promise<Uint8Array> | null = null;
 
 function resolveResvgWasmPath(): string {
   const here = path.dirname(fileURLToPath(import.meta.url));
@@ -34,6 +35,33 @@ function resolveResvgWasmPath(): string {
   throw new Error('Module WASM resvg introuvable.');
 }
 
+function resolveCardFontPath(): string {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    path.resolve(process.cwd(), 'api/assets/fonts/Roboto-Bold.woff2'),
+    path.resolve(process.cwd(), 'assets/fonts/Roboto-Bold.woff2'),
+    path.resolve(here, '../../assets/fonts/Roboto-Bold.woff2'),
+    path.resolve(process.cwd(), 'server/assets/fonts/Roboto-Bold.woff2'),
+  ];
+
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  throw new Error('Police Roboto introuvable pour le rendu de carte.');
+}
+
+async function loadCardFont(): Promise<Uint8Array> {
+  if (cardFontPromise) {
+    return cardFontPromise;
+  }
+
+  cardFontPromise = readFile(resolveCardFontPath()).then((buffer) => new Uint8Array(buffer));
+  return cardFontPromise;
+}
+
 async function ensureResvgReady(): Promise<void> {
   if (resvgInitPromise) {
     return resvgInitPromise;
@@ -58,11 +86,17 @@ async function ensureResvgReady(): Promise<void> {
 
 export async function renderSvgToPng(svg: string, width: number): Promise<Buffer> {
   await ensureResvgReady();
+  const fontBuffer = await loadCardFont();
   const { Resvg } = await import('@resvg/resvg-wasm');
   const resvg = new Resvg(svg, {
     fitTo: {
       mode: 'width',
       value: width,
+    },
+    font: {
+      fontBuffers: [fontBuffer],
+      defaultFontFamily: 'Roboto',
+      sansSerifFamily: 'Roboto',
     },
   });
 
