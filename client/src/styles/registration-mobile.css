@@ -51,7 +51,8 @@ body.reg-mobile-active {
 /* ── Layout ── */
 
 .reg-mobile__content,
-.reg-desktop-panel {
+.reg-desktop-panel,
+.card-download-content {
   --reg-field-width: 100%;
   --reg-form-gap: 15px;
   --reg-field-height: 54px;

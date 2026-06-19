@@ -16,9 +16,10 @@ export function parsePaymentReturnFromUrl(search = window.location.search): Paym
   const status = readReturnStatus(search);
   const params = new URLSearchParams(search);
   const orderNumber = params.get('order') ?? params.get('orderNumber') ?? undefined;
+  const paymentReference = params.get('ref') ?? undefined;
 
   if (status === 'success') {
-    return { status: 'success', orderNumber };
+    return { status: 'success', orderNumber, paymentReference };
   }
 
   if (status === 'cancel') {
@@ -42,5 +43,6 @@ export function clearPaymentReturnParams(): void {
   url.searchParams.delete('amp;status');
   url.searchParams.delete('order');
   url.searchParams.delete('orderNumber');
+  url.searchParams.delete('ref');
   window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
 }

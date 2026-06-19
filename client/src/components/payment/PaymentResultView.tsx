@@ -5,7 +5,7 @@ import type { PaymentResultData } from '../../types/paymentResult';
 type PaymentResultViewProps = {
   result: PaymentResultData;
   onRetry?: () => void;
-  onDownloadCard?: () => void;
+  onDownloadCard?: () => void | Promise<void>;
 };
 
 const SUCCESS_MESSAGE = (
@@ -31,11 +31,7 @@ export function PaymentResultView({ result, onRetry, onDownloadCard }: PaymentRe
   const isExistingMember = isSuccess && Boolean(result.memberNumber);
 
   const handleDownloadCard = () => {
-    if (result.cardDownloadUrl) {
-      window.open(result.cardDownloadUrl, '_blank', 'noopener,noreferrer');
-      return;
-    }
-    onDownloadCard?.();
+    void onDownloadCard?.();
   };
 
   return (
@@ -62,7 +58,7 @@ export function PaymentResultView({ result, onRetry, onDownloadCard }: PaymentRe
             : (result.message ?? DEFAULT_FAILURE_MESSAGE)}
         </p>
 
-        {isExistingMember && (
+        {isSuccess && result.memberNumber && (
           <p className="payment-result-reference">
             Numéro de membre : <strong>{result.memberNumber}</strong>
           </p>

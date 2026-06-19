@@ -1,0 +1,215 @@
+/* Page téléchargement carte — alignée sur inscription / conditions */
+
+body.card-download-active {
+  padding: 0;
+  overflow: hidden;
+  background: #830606;
+}
+
+.card-download-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  background: var(--mobile-form-gradient);
+  min-height: 100dvh;
+}
+
+.card-download-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.card-download-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.card-download-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: max(24px, env(safe-area-inset-top)) 28px max(20px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.card-download-header {
+  flex-shrink: 0;
+  margin-bottom: 20px;
+}
+
+.card-download-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.card-download-back:hover {
+  text-decoration: underline;
+}
+
+.card-download-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+}
+
+.card-download-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.card-download-intro__logo {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 16px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.card-download-form {
+  margin-top: 8px;
+}
+
+.card-download-cta {
+  width: 100%;
+  align-self: stretch;
+  margin-top: 4px;
+}
+
+.card-download-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 72, 72, 0.18);
+  border: 1px solid rgba(255, 140, 140, 0.55);
+  color: #fff;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.card-download-footer {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.card-download-status {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+}
+
+.card-download-status__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 24px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+.card-download-status__icon--error {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.card-download-status__glyph {
+  width: 48px;
+  height: 48px;
+  color: #ed0505;
+}
+
+.card-download-status__glyph--error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.card-download-status__glyph--spin {
+  animation: card-download-spin 1s linear infinite;
+}
+
+@keyframes card-download-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.card-download-status .reg-mobile__title {
+  width: 100%;
+  text-align: center;
+}
+
+.card-download-status__message {
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.card-download-status__message--error {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.card-download-alt-link {
+  margin-top: 16px;
+  color: #fff;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (min-width: 1024px) {
+  .card-download-content {
+    max-width: 520px;
+    margin: 0 auto;
+    padding-top: 40px;
+    padding-bottom: 32px;
+    --reg-field-height: 56px;
+    --reg-form-gap: 16px;
+  }
+
+  .card-download-content .reg-mobile__field input {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-download-status__glyph--spin {
+    animation: none;
+  }
+}

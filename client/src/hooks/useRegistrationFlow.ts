@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { fetchAndDownloadCard } from '../api/cards';
 import {
   buildRegistrationPayload,
   checkPaymentStatus,
@@ -57,10 +58,65 @@ export function useRegistrationFlow() {
 
   useEffect(() => {
     const returnResult = parsePaymentReturnFromUrl();
-    if (returnResult) {
+    if (!returnResult) {
+      return;
+    }
+
+    if (returnResult.status !== 'success') {
       setPaymentResult(returnResult);
       clearPaymentReturnParams();
+      return;
     }
+
+    const paymentKey = returnResult.orderNumber ?? returnResult.paymentReference;
+    if (!paymentKey) {
+      setPaymentResult(returnResult);
+      clearPaymentReturnParams();
+      return;
+    }
+
+    let cancelled = false;
+
+    const resolvePaidReturn = async () => {
+      for (let attempt = 0; attempt < 12; attempt += 1) {
+        try {
+          const status = await checkPaymentStatus(paymentKey);
+          if (status.success && status.status === 'paid') {
+            if (!cancelled) {
+              setPaymentResult({
+                status: 'success',
+                orderNumber: returnResult.orderNumber ?? paymentKey,
+                paymentReference: returnResult.paymentReference,
+                memberNumber: status.memberNumber,
+                cardDownloadUrl: status.cardDownloadUrl,
+                cardDownloadToken: status.cardDownloadToken,
+              });
+              clearPaymentReturnParams();
+            }
+            return;
+          }
+        } catch {
+          // Retry shortly while webhook/finalization completes.
+        }
+
+        await new Promise((resolve) => window.setTimeout(resolve, 2000));
+      }
+
+      if (!cancelled) {
+        setPaymentResult({
+          status: 'success',
+          orderNumber: returnResult.orderNumber ?? paymentKey,
+          paymentReference: returnResult.paymentReference,
+        });
+        clearPaymentReturnParams();
+      }
+    };
+
+    void resolvePaidReturn();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const buildPayload = () =>
@@ -201,7 +257,13 @@ export function useRegistrationFlow() {
           if (status.success && status.status === 'paid') {
             stopPolling();
             setLoading(null);
-            setPaymentResult({ status: 'success', orderNumber });
+            setPaymentResult({
+              status: 'success',
+              orderNumber,
+              memberNumber: status.memberNumber,
+              cardDownloadUrl: status.cardDownloadUrl,
+              cardDownloadToken: status.cardDownloadToken,
+            });
           } else if (status.success && status.status === 'failed') {
             stopPolling();
             setLoading(null);
@@ -301,6 +363,38 @@ export function useRegistrationFlow() {
 
   const dismissLoading = () => setLoading(null);
 
+  const handleDownloadCard = async () => {
+    if (!paymentResult || paymentResult.status !== 'success') {
+      return;
+    }
+
+    try {
+      if (paymentResult.cardDownloadUrl) {
+        await fetchAndDownloadCard(
+          paymentResult.cardDownloadToken
+            ? { token: paymentResult.cardDownloadToken }
+            : { order: paymentResult.orderNumber ?? paymentResult.paymentReference },
+          paymentResult.memberNumber
+            ? `carte-simba-${paymentResult.memberNumber}.png`
+            : 'carte-simba.png',
+        );
+        return;
+      }
+
+      const paymentKey = paymentResult.orderNumber ?? paymentResult.paymentReference;
+      if (paymentKey) {
+        await fetchAndDownloadCard(
+          { order: paymentKey },
+          paymentResult.memberNumber
+            ? `carte-simba-${paymentResult.memberNumber}.png`
+            : 'carte-simba.png',
+        );
+      }
+    } catch {
+      toast.error('Impossible de télécharger votre carte pour le moment.');
+    }
+  };
+
   const handlePrev = () => {
     setCurrentStep((step) => Math.max(step - 1, 2));
   };
@@ -335,6 +429,7 @@ export function useRegistrationFlow() {
     handlePrev,
     handleStepOneChange,
     dismissLoading,
+    handleDownloadCard,
   };
 }
 

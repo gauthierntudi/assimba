@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Bounce, ToastContainer } from 'react-toastify';
 import { AppNavigationProvider } from './context/AppNavigationContext';
-import { HOME_PATH, isTermsPath, TERMS_PATH } from './config/routes';
+import {
+  HOME_PATH,
+  isCardDownloadPath,
+  isTermsPath,
+  readCardDownloadToken,
+  TERMS_PATH,
+} from './config/routes';
+import { CardDownloadPage } from './pages/CardDownloadPage';
+import { MemberCardLookupPage } from './pages/MemberCardLookupPage';
 import { RegistrationPage } from './pages/RegistrationPage';
 import { TermsPage } from './pages/TermsPage';
 import { WelcomePage } from './pages/WelcomePage';
@@ -18,6 +26,9 @@ function resolveInitialFlow(): ActiveFlow {
 function App() {
   const [activeFlow, setActiveFlow] = useState<ActiveFlow>(resolveInitialFlow);
   const [showTerms, setShowTerms] = useState(() => isTermsPath(window.location.pathname));
+  const cardDownloadToken = isCardDownloadPath(window.location.pathname)
+    ? readCardDownloadToken(window.location.search)
+    : null;
 
   useEffect(() => {
     const syncTermsVisibility = () => {
@@ -56,13 +67,25 @@ function App() {
     setShowTerms(false);
   }, []);
 
+  const renderMainScreen = () => {
+    if (isCardDownloadPath(window.location.pathname)) {
+      if (cardDownloadToken) {
+        return <CardDownloadPage token={cardDownloadToken} />;
+      }
+
+      return <MemberCardLookupPage />;
+    }
+
+    if (activeFlow === 'welcome') {
+      return <WelcomePage onStart={() => setActiveFlow('registration')} />;
+    }
+
+    return <RegistrationPage />;
+  };
+
   return (
     <AppNavigationProvider openTerms={openTerms} closeTerms={closeTerms}>
-      {activeFlow === 'welcome' ? (
-        <WelcomePage onStart={() => setActiveFlow('registration')} />
-      ) : (
-        <RegistrationPage />
-      )}
+      {renderMainScreen()}
       {showTerms && <TermsPage />}
       <ToastContainer
         position="top-center"

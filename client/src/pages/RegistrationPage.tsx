@@ -13,9 +13,7 @@ export function RegistrationPage() {
       <PaymentResultPage
         result={flow.paymentResult}
         onRetry={flow.handlePaymentRetry}
-        onDownloadCard={() => {
-          // TODO: endpoint téléchargement carte membre
-        }}
+        onDownloadCard={flow.handleDownloadCard}
       />
     );
   }

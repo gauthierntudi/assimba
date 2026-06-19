@@ -24,6 +24,7 @@ rmSync(apiDist, { recursive: true, force: true });
 rmSync(path.join(apiDir, 'node_modules'), { recursive: true, force: true });
 
 cpSync(serverDist, apiDist, { recursive: true });
+cpSync(path.join(root, 'server/assets'), path.join(apiDir, 'assets'), { recursive: true });
 copyFileSync(engine, engineDest);
 
 console.log(`Prepared API bundle: ${apiDist}`);

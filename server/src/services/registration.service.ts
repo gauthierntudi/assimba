@@ -1,4 +1,5 @@
 import { prisma } from '../lib/prisma.js';
+import { buildCardLinksForSupporter } from './card.service.js';
 import { sendMemberSMS } from './sms.service.js';
 
 async function generateUniqueMemberNumber(): Promise<string> {
@@ -19,7 +20,9 @@ export async function finalizeRegistration(
   flexpayReference: string,
 ): Promise<string | false> {
   const invoice = await prisma.invoice.findFirst({
-    where: { flexpayReference },
+    where: {
+      OR: [{ flexpayReference }, { reference: flexpayReference }],
+    },
     include: { supporter: true },
   });
 
@@ -36,7 +39,13 @@ export async function finalizeRegistration(
   });
 
   if (supporter.phone) {
-    await sendMemberSMS(supporter.phone, memberNumber, supporter.firstname ?? '');
+    const links = buildCardLinksForSupporter(supporter.id, memberNumber);
+    await sendMemberSMS(
+      supporter.phone,
+      memberNumber,
+      supporter.firstname ?? '',
+      links.cardDownloadPageUrl,
+    );
   }
 
   return memberNumber;

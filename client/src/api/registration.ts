@@ -31,7 +31,15 @@ export type PaymentResponse =
   | { success: false; message: string; raw?: string };
 
 export type PaymentStatusResponse =
-  | { success: true; status: 'paid' | 'pending' | 'failed'; message?: string }
+  | {
+      success: true;
+      status: 'paid';
+      memberNumber?: string;
+      cardDownloadToken?: string;
+      cardDownloadUrl?: string;
+      cardDownloadPageUrl?: string;
+    }
+  | { success: true; status: 'pending' | 'failed'; message?: string }
   | { success: false; message: string };
 
 export type DraftFormPatch = {
@@ -214,9 +222,9 @@ export async function createPayment(payload: Record<string, unknown>): Promise<P
   return data;
 }
 
-export async function checkPaymentStatus(order: string): Promise<PaymentStatusResponse> {
+export async function checkPaymentStatus(paymentKey: string): Promise<PaymentStatusResponse> {
   const { data } = await api.get<PaymentStatusResponse>('/payments/status', {
-    params: { order },
+    params: { order: paymentKey },
   });
   return data;
 }

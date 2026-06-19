@@ -117,9 +117,11 @@ export async function markPaymentAttemptPaid(flexpayReference: string) {
   return attempt.supporterId;
 }
 
-export async function getInvoiceStatusByFlexpayReference(flexpayReference: string) {
+export async function getInvoiceStatusByFlexpayReference(paymentKey: string) {
   return prisma.invoice.findFirst({
-    where: { flexpayReference },
-    select: { status: true, supporterId: true },
+    where: {
+      OR: [{ flexpayReference: paymentKey }, { reference: paymentKey }],
+    },
+    select: { status: true, supporterId: true, flexpayReference: true, reference: true },
   });
 }

@@ -2,9 +2,9 @@ import { env, flexpayCallbackUrl } from '../config/env.js';
 import { buildInvoiceReference } from '../utils/payload.js';
 import { isValidFlexpayDrcPhone, toFlexpayPhone } from '../utils/phone.js';
 import { calculatePricing } from './pricing.service.js';
+import { buildCardLinksForSupporter } from './card.service.js';
 import {
   attachFlexpayOrderNumber,
-  getInvoiceStatusByFlexpayReference,
   markPaymentAttemptFailed,
   markPaymentAttemptPaid,
   startPaymentAttempt,
@@ -22,6 +22,41 @@ type FlexpayCheckResponse = {
   code?: string;
   transaction?: { status?: string };
 };
+
+async function buildPaidStatusResponse(paymentKey: string) {
+  const { finalizeRegistration } = await import('./registration.service.js');
+  const memberNumber = await finalizeRegistration(paymentKey);
+
+  if (!memberNumber) {
+    return { success: true as const, status: 'paid' as const };
+  }
+
+  const invoice = await prisma.invoice.findFirst({
+    where: {
+      OR: [{ flexpayReference: paymentKey }, { reference: paymentKey }],
+    },
+    select: { supporterId: true },
+  });
+
+  if (!invoice) {
+    return {
+      success: true as const,
+      status: 'paid' as const,
+      memberNumber,
+    };
+  }
+
+  const links = buildCardLinksForSupporter(invoice.supporterId, memberNumber);
+
+  return {
+    success: true as const,
+    status: 'paid' as const,
+    memberNumber,
+    cardDownloadToken: links.token,
+    cardDownloadUrl: `/api/cards/download?token=${encodeURIComponent(links.token)}`,
+    cardDownloadPageUrl: links.cardDownloadPageUrl,
+  };
+}
 
 function pickPaymentPhone(body: Record<string, unknown>): string {
   return String(body.payment_phone_full ?? body.paymentPhone ?? '').trim();
@@ -197,16 +232,20 @@ export async function initiatePayment(body: Record<string, unknown>) {
   return { success: false as const, message: 'Type de paiement invalide' };
 }
 
-export async function checkPaymentStatus(orderNumber: string) {
-  const invoice = await getInvoiceStatusByFlexpayReference(orderNumber);
+export async function checkPaymentStatus(paymentKey: string) {
+  const invoice = await prisma.invoice.findFirst({
+    where: {
+      OR: [{ flexpayReference: paymentKey }, { reference: paymentKey }],
+    },
+    select: { status: true, flexpayReference: true, reference: true },
+  });
 
   if (invoice?.status === 'paid') {
-    const { finalizeRegistration } = await import('./registration.service.js');
-    await finalizeRegistration(orderNumber);
-    return { success: true as const, status: 'paid' as const };
+    return buildPaidStatusResponse(invoice.flexpayReference ?? invoice.reference ?? paymentKey);
   }
 
-  const checkUrl = `${env.flexpay.checkApiUrl}/${encodeURIComponent(orderNumber)}`;
+  const lookupKey = invoice?.flexpayReference ?? paymentKey;
+  const checkUrl = `${env.flexpay.checkApiUrl}/${encodeURIComponent(lookupKey)}`;
   const response = await fetch(checkUrl, {
     headers: {
       Authorization: env.flexpay.token,
@@ -222,17 +261,15 @@ export async function checkPaymentStatus(orderNumber: string) {
       const txStatus = data.transaction.status;
 
       if (String(txStatus) === '0') {
-        await markPaymentAttemptPaid(orderNumber);
-
-        const { finalizeRegistration } = await import('./registration.service.js');
-        await finalizeRegistration(orderNumber);
-
-        return { success: true as const, status: 'paid' as const };
+        await markPaymentAttemptPaid(lookupKey);
+        return buildPaidStatusResponse(lookupKey);
       }
 
       if (String(txStatus) === '1') {
         const attempt = await prisma.purchaseHistory.findFirst({
-          where: { flexpayReference: orderNumber },
+          where: {
+            OR: [{ flexpayReference: lookupKey }, { reference: lookupKey }],
+          },
           select: { reference: true },
         });
 

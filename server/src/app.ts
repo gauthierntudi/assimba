@@ -3,6 +3,7 @@ import express from 'express';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { prisma } from './lib/prisma.js';
+import cardsRouter from './routes/cards.js';
 import paymentsRouter from './routes/payments.js';
 import supportersRouter from './routes/supporters.js';
 import webhooksRouter from './routes/webhooks.js';
@@ -23,6 +24,7 @@ app.get('/api/health', async (_req, res) => {
 });
 
 app.use('/api/supporters', supportersRouter);
+app.use('/api/cards', cardsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/webhooks', webhooksRouter);
 

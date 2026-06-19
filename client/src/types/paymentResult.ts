@@ -3,9 +3,11 @@ export type PaymentResultStatus = 'success' | 'failed';
 export type PaymentResultData = {
   status: PaymentResultStatus;
   orderNumber?: string;
+  paymentReference?: string;
   memberNumber?: string;
   message?: string;
   cardDownloadUrl?: string;
+  cardDownloadToken?: string;
 };
 
 export const PAYMENT_FAILURE_MESSAGES = {

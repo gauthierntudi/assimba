@@ -15,7 +15,7 @@ router.post(
 router.get(
   '/status',
   asyncHandler(async (req, res) => {
-    const order = String(req.query.order ?? '').trim();
+    const order = String(req.query.order ?? req.query.ref ?? '').trim();
 
     if (!order) {
       res.status(400).json({ success: false, message: 'Order number missing' });

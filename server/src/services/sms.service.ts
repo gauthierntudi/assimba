@@ -113,8 +113,11 @@ export async function sendMemberSMS(
   phone: string,
   memberNumber: string,
   name: string,
+  cardDownloadUrl?: string,
 ): Promise<boolean> {
-  const message = `Félicitations ${name} ! Votre inscription est validée. Votre numéro de membre est : ${memberNumber}. Merci de votre soutien !`;
+  const message = cardDownloadUrl
+    ? `Félicitations ${name} ! Votre inscription est validée. Votre numéro de membre est : ${memberNumber}. Téléchargez votre carte : ${cardDownloadUrl}`
+    : `Félicitations ${name} ! Votre inscription est validée. Votre numéro de membre est : ${memberNumber}. Merci de votre soutien !`;
 
   if (env.sms.distribution === 'UNIKRON') {
     return sendUnikronSMS(phone, message);
