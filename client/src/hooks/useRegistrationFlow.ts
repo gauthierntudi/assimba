@@ -369,11 +369,9 @@ export function useRegistrationFlow() {
     }
 
     try {
-      if (paymentResult.cardDownloadUrl) {
+      if (paymentResult.cardDownloadToken) {
         await fetchAndDownloadCard(
-          paymentResult.cardDownloadToken
-            ? { token: paymentResult.cardDownloadToken }
-            : { order: paymentResult.orderNumber ?? paymentResult.paymentReference },
+          { token: paymentResult.cardDownloadToken },
           paymentResult.memberNumber
             ? `carte-simba-${paymentResult.memberNumber}.png`
             : 'carte-simba.png',
@@ -388,6 +386,14 @@ export function useRegistrationFlow() {
           paymentResult.memberNumber
             ? `carte-simba-${paymentResult.memberNumber}.png`
             : 'carte-simba.png',
+        );
+        return;
+      }
+
+      if (paymentResult.memberNumber) {
+        await fetchAndDownloadCard(
+          { fanId: paymentResult.memberNumber },
+          `carte-simba-${paymentResult.memberNumber}.png`,
         );
       }
     } catch {

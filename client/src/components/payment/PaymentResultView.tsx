@@ -28,7 +28,15 @@ const DEFAULT_FAILURE_MESSAGE = (
 
 export function PaymentResultView({ result, onRetry, onDownloadCard }: PaymentResultViewProps) {
   const isSuccess = result.status === 'success';
-  const isExistingMember = isSuccess && Boolean(result.memberNumber);
+  const canDownloadCard =
+    isSuccess &&
+    Boolean(
+      result.cardDownloadToken ||
+        result.cardDownloadUrl ||
+        result.orderNumber ||
+        result.paymentReference ||
+        result.memberNumber,
+    );
 
   const handleDownloadCard = () => {
     void onDownloadCard?.();
@@ -51,16 +59,12 @@ export function PaymentResultView({ result, onRetry, onDownloadCard }: PaymentRe
         <h1 className="payment-result-title">{isSuccess ? 'BIENVENUE!' : 'ÉCHEC'}</h1>
 
         <p className="payment-result-message">
-          {isSuccess
-            ? isExistingMember
-              ? result.message
-              : SUCCESS_MESSAGE
-            : (result.message ?? DEFAULT_FAILURE_MESSAGE)}
+          {isSuccess ? SUCCESS_MESSAGE : (result.message ?? DEFAULT_FAILURE_MESSAGE)}
         </p>
 
         {isSuccess && result.memberNumber && (
           <p className="payment-result-reference">
-            Numéro de membre : <strong>{result.memberNumber}</strong>
+            FAN ID : <strong>{result.memberNumber}</strong>
           </p>
         )}
 
@@ -72,7 +76,7 @@ export function PaymentResultView({ result, onRetry, onDownloadCard }: PaymentRe
       </main>
 
       <div className="payment-result-actions">
-        {isSuccess && !isExistingMember ? (
+        {canDownloadCard ? (
           <button type="button" className="payment-result-btn" onClick={handleDownloadCard}>
             Télécharger ma carte
           </button>
