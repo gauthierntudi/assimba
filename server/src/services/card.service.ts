@@ -14,6 +14,7 @@ const CARD_WIDTH = 1003;
 const CARD_HEIGHT = 649;
 const VALUE_X = 252;
 const FIELD_FONT_SIZE = 30;
+const TEXT_Y_OFFSET = 2.4;
 const STANDARD_TEXT_COLOR = '#d00404';
 const PREMIUM_TEXT_COLOR = '#ffffff';
 
@@ -46,22 +47,22 @@ type CardLayout = {
 const STANDARD_LAYOUT: CardLayout = {
   template: 'standard.png',
   fields: {
-    lastname: { x: VALUE_X, y: 303, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 22 },
-    postname: { x: VALUE_X, y: 343, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 22 },
-    firstname: { x: VALUE_X, y: 383, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 22 },
-    fanId: { x: VALUE_X, y: 462, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 16 },
-    section: { x: VALUE_X, y: 501, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 24 },
+    lastname: { x: VALUE_X, y: 303 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 22 },
+    postname: { x: VALUE_X, y: 343 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 22 },
+    firstname: { x: VALUE_X, y: 383 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 22 },
+    fanId: { x: VALUE_X, y: 462 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 16 },
+    section: { x: VALUE_X, y: 501 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: STANDARD_TEXT_COLOR, maxChars: 24 },
   },
 };
 
 const PREMIUM_LAYOUT: CardLayout = {
   template: 'premium.png',
   fields: {
-    lastname: { x: VALUE_X, y: 303, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 22 },
-    postname: { x: VALUE_X, y: 343, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 22 },
-    firstname: { x: VALUE_X, y: 383, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 22 },
-    fanId: { x: VALUE_X, y: 462, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 16 },
-    section: { x: VALUE_X, y: 501, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 24 },
+    lastname: { x: VALUE_X, y: 303 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 22 },
+    postname: { x: VALUE_X, y: 343 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 22 },
+    firstname: { x: VALUE_X, y: 383 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 22 },
+    fanId: { x: VALUE_X, y: 462 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 16 },
+    section: { x: VALUE_X, y: 501 + TEXT_Y_OFFSET, size: FIELD_FONT_SIZE, color: PREMIUM_TEXT_COLOR, maxChars: 24 },
   },
 };
 
