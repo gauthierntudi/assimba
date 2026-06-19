@@ -292,7 +292,7 @@ body.reg-desktop-active {
 }
 
 .reg-desktop-panel .reg-mobile__cta-row {
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .reg-desktop-panel .reg-mobile__footer-link,
