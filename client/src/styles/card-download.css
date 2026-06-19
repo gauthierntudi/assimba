@@ -193,6 +193,62 @@ body.card-download-active {
   text-underline-offset: 2px;
 }
 
+.card-verify-details {
+  width: 100%;
+  max-width: 320px;
+  margin-top: 28px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+}
+
+.card-verify-details__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #0f7a2d;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.card-verify-details__list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.card-verify-details__row {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+}
+
+.card-verify-details__row dt {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.card-verify-details__row dd {
+  margin: 0;
+  color: #fff;
+  font-family: 'Inter', 'Barlow', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 @media (min-width: 1024px) {
   .card-download-content {
     max-width: 520px;

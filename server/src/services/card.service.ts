@@ -6,7 +6,7 @@ import { prisma } from '../lib/prisma.js';
 import {
   createCardDownloadToken,
   parseCardDownloadToken,
-  buildCardDownloadPageUrl,
+  buildCardVerifyPageUrl,
 } from './card-token.service.js';
 import { renderSvgToPng } from './card-renderer.js';
 
@@ -130,7 +130,7 @@ function buildQrPayload(supporter: {
   memberNumber: string;
 }): string {
   if (supporter.id != null) {
-    return buildCardDownloadPageUrl(
+    return buildCardVerifyPageUrl(
       createCardDownloadToken(supporter.id, supporter.memberNumber),
     );
   }
@@ -261,6 +261,23 @@ export async function generateSupporterCardPng(supporter: {
   const svg = buildCardSvg(layout, templateBase64, qrCode.toString('base64'), values);
 
   return renderSvgToPng(svg, CARD_WIDTH);
+}
+
+export async function verifyCardByToken(token: string) {
+  const supporter = await loadPaidSupporterByToken(token);
+  if (!supporter?.memberNumber) {
+    return null;
+  }
+
+  return {
+    valid: true as const,
+    memberNumber: supporter.memberNumber,
+    firstname: supporter.firstname,
+    lastname: supporter.lastname,
+    middlename: supporter.middlename,
+    section: supporter.section,
+    memberType: supporter.memberType === 'premium' ? 'premium' : 'standard',
+  };
 }
 
 export async function getCardDownloadByToken(token: string) {

@@ -63,3 +63,31 @@ export function buildCardDownloadUrl(params: { token?: string; order?: string })
 
   return `/api/cards/download?${search.toString()}`;
 }
+
+export type VerifiedCard = {
+  valid: true;
+  memberNumber: string;
+  firstname: string | null;
+  lastname: string | null;
+  middlename: string | null;
+  section: string | null;
+  memberType: 'standard' | 'premium';
+};
+
+export async function verifyCard(token: string): Promise<VerifiedCard> {
+  const response = await fetch(`/api/cards/verify?token=${encodeURIComponent(token)}`);
+  const payload = (await response.json().catch(() => null)) as
+    | { success: true; card: VerifiedCard }
+    | { success: false; message?: string }
+    | null;
+
+  if (!response.ok || !payload?.success) {
+    throw new Error(
+      payload && 'message' in payload && payload.message
+        ? payload.message
+        : 'Impossible de vérifier cette carte.',
+    );
+  }
+
+  return payload.card;
+}

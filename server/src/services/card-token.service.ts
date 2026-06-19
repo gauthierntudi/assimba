@@ -55,6 +55,10 @@ export function buildCardDownloadPageUrl(token: string): string {
   return `${env.webUrl}/telecharger-carte?token=${encodeURIComponent(token)}`;
 }
 
+export function buildCardVerifyPageUrl(token: string): string {
+  return `${env.webUrl}/verifier-carte?token=${encodeURIComponent(token)}`;
+}
+
 export function buildCardDownloadApiUrl(token: string): string {
   return `${env.appUrl}/api/cards/download?token=${encodeURIComponent(token)}`;
 }
@@ -66,5 +70,6 @@ export function buildCardLinksForSupporter(supporterId: number, memberNumber: st
     token,
     cardDownloadUrl: buildCardDownloadApiUrl(token),
     cardDownloadPageUrl: buildCardDownloadPageUrl(token),
+    cardVerifyPageUrl: buildCardVerifyPageUrl(token),
   };
 }

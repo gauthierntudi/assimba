@@ -4,11 +4,13 @@ import { AppNavigationProvider } from './context/AppNavigationContext';
 import {
   HOME_PATH,
   isCardDownloadPath,
+  isCardVerifyPath,
   isTermsPath,
   readCardDownloadToken,
   TERMS_PATH,
 } from './config/routes';
 import { CardDownloadPage } from './pages/CardDownloadPage';
+import { CardVerifyPage } from './pages/CardVerifyPage';
 import { MemberCardLookupPage } from './pages/MemberCardLookupPage';
 import { RegistrationPage } from './pages/RegistrationPage';
 import { TermsPage } from './pages/TermsPage';
@@ -27,6 +29,9 @@ function App() {
   const [activeFlow, setActiveFlow] = useState<ActiveFlow>(resolveInitialFlow);
   const [showTerms, setShowTerms] = useState(() => isTermsPath(window.location.pathname));
   const cardDownloadToken = isCardDownloadPath(window.location.pathname)
+    ? readCardDownloadToken(window.location.search)
+    : null;
+  const cardVerifyToken = isCardVerifyPath(window.location.pathname)
     ? readCardDownloadToken(window.location.search)
     : null;
 
@@ -68,6 +73,10 @@ function App() {
   }, []);
 
   const renderMainScreen = () => {
+    if (isCardVerifyPath(window.location.pathname)) {
+      return <CardVerifyPage token={cardVerifyToken ?? ''} />;
+    }
+
     if (isCardDownloadPath(window.location.pathname)) {
       if (cardDownloadToken) {
         return <CardDownloadPage token={cardDownloadToken} />;

@@ -1,8 +1,37 @@
 import { Router } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { getCardDownloadByFanId, getCardDownloadByOrder, getCardDownloadByToken } from '../services/card.service.js';
+import {
+  getCardDownloadByFanId,
+  getCardDownloadByOrder,
+  getCardDownloadByToken,
+  verifyCardByToken,
+} from '../services/card.service.js';
 
 const router = Router();
+
+router.get(
+  '/verify',
+  asyncHandler(async (req, res) => {
+    const token = String(req.query.token ?? '').trim();
+
+    if (!token) {
+      res.status(400).json({ success: false, message: 'Jeton de vérification requis.' });
+      return;
+    }
+
+    const result = await verifyCardByToken(token);
+
+    if (!result) {
+      res.status(404).json({
+        success: false,
+        message: 'Carte non reconnue ou accès non autorisé.',
+      });
+      return;
+    }
+
+    res.json({ success: true, card: result });
+  }),
+);
 
 router.post(
   '/download-by-fan-id',
