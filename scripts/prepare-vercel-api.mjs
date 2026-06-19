@@ -1,4 +1,4 @@
-import { copyFileSync, cpSync, existsSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -26,5 +26,13 @@ rmSync(path.join(apiDir, 'node_modules'), { recursive: true, force: true });
 cpSync(serverDist, apiDist, { recursive: true });
 cpSync(path.join(root, 'server/assets'), path.join(apiDir, 'assets'), { recursive: true });
 copyFileSync(engine, engineDest);
+
+const resvgWasmSource = path.join(root, 'node_modules/@resvg/resvg-wasm/index_bg.wasm');
+const resvgWasmDestDir = path.join(apiDir, 'assets/resvg');
+if (!existsSync(resvgWasmSource)) {
+  throw new Error(`Missing resvg wasm at ${resvgWasmSource}.`);
+}
+mkdirSync(resvgWasmDestDir, { recursive: true });
+copyFileSync(resvgWasmSource, path.join(resvgWasmDestDir, 'index_bg.wasm'));
 
 console.log(`Prepared API bundle: ${apiDist}`);

@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { prisma } from '../lib/prisma.js';
@@ -7,6 +8,7 @@ import {
   parseCardDownloadToken,
   buildCardDownloadPageUrl,
 } from './card-token.service.js';
+import { renderSvgToPng } from './card-renderer.js';
 
 const CARD_WIDTH = 1003;
 const CARD_HEIGHT = 649;
@@ -99,8 +101,10 @@ function truncate(value: string, maxChars: number): string {
   return `${trimmed.slice(0, maxChars - 1)}…`;
 }
 
-function buildOverlaySvg(
+function buildCardSvg(
   layout: CardLayout,
+  templateBase64: string,
+  qrBase64: string,
   values: {
     lastname: string;
     postname: string;
@@ -118,7 +122,7 @@ function buildOverlaySvg(
     })
     .join('');
 
-  return `<svg width="${CARD_WIDTH}" height="${CARD_HEIGHT}" xmlns="http://www.w3.org/2000/svg">${textNodes}</svg>`;
+  return `<svg width="${CARD_WIDTH}" height="${CARD_HEIGHT}" viewBox="0 0 ${CARD_WIDTH} ${CARD_HEIGHT}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><image href="data:image/png;base64,${templateBase64}" x="0" y="0" width="${CARD_WIDTH}" height="${CARD_HEIGHT}" /><g>${textNodes}</g><image href="data:image/png;base64,${qrBase64}" x="${QR_PLACEMENT.left}" y="${QR_PLACEMENT.top}" width="${QR_PLACEMENT.size}" height="${QR_PLACEMENT.size}" /></svg>`;
 }
 
 function buildQrPayload(supporter: {
@@ -243,26 +247,20 @@ export async function generateSupporterCardPng(supporter: {
 
   const layout = pickLayout(supporter.memberType);
   const templatePath = path.join(resolveAssetsDir(), layout.template);
-  const overlay = buildOverlaySvg(layout, {
+  const templateBase64 = (await readFile(templatePath)).toString('base64');
+  const values = {
     lastname: supporter.lastname ?? '',
     postname: supporter.middlename ?? '',
     firstname: supporter.firstname ?? '',
     fanId: supporter.memberNumber,
     section: supporter.section ?? '',
-  });
+  };
   const qrCode = await buildQrCodePng(
     buildQrPayload({ id: supporter.id, memberNumber: supporter.memberNumber }),
   );
+  const svg = buildCardSvg(layout, templateBase64, qrCode.toString('base64'), values);
 
-  const sharp = (await import('sharp')).default;
-
-  return sharp(templatePath)
-    .composite([
-      { input: Buffer.from(overlay), top: 0, left: 0 },
-      { input: qrCode, top: QR_PLACEMENT.top, left: QR_PLACEMENT.left },
-    ])
-    .png()
-    .toBuffer();
+  return renderSvgToPng(svg, CARD_WIDTH);
 }
 
 export async function getCardDownloadByToken(token: string) {

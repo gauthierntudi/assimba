@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "qrcode": "^1.5.4",
-    "sharp": "0.35.1"
+    "@resvg/resvg-wasm": "2.6.2",
+    "qrcode": "^1.5.4"
   }
 }
