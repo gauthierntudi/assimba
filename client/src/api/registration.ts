@@ -1,5 +1,6 @@
 import { api } from './client';
 import { toFlexpayPhone } from '../utils/phone';
+import { parseMultiSelectValue, serializeMultiSelect } from '../utils/multiSelect';
 import type {
   MemberType,
   StepFiveForm,
@@ -85,9 +86,9 @@ export function mapDraftToFormPatch(data: Record<string, unknown>): DraftFormPat
     stepFour: {
       section: String(data.section ?? ''),
       years: data.years != null ? String(data.years) : '',
-      trainingFreq: String(data.training_freq ?? ''),
-      matchFreq: String(data.match_freq ?? ''),
-      followMethod: String(data.follow_method ?? ''),
+      trainingFreq: parseMultiSelectValue(data.training_freq),
+      matchFreq: parseMultiSelectValue(data.match_freq),
+      followMethod: parseMultiSelectValue(data.follow_method),
     },
     stepFive: {
       memberType: (data.member_type as MemberType) || 'simple',
@@ -117,6 +118,11 @@ function preferUserText(userValue: string, dbValue: unknown): string {
 
 function preferUserBool(userValue: boolean, dbValue: boolean): boolean {
   return userValue || dbValue;
+}
+
+function preferUserMultiSelect(userValues: string[], dbValue: unknown): string[] {
+  if (userValues.length > 0) return userValues;
+  return parseMultiSelectValue(dbValue);
 }
 
 export function mergeDraftIntoForms(
@@ -158,9 +164,9 @@ export function mergeDraftIntoForms(
       ...forms.stepFour,
       section: preferUserText(forms.stepFour.section, data.section),
       years: preferUserText(forms.stepFour.years, data.years),
-      trainingFreq: preferUserText(forms.stepFour.trainingFreq, data.training_freq),
-      matchFreq: preferUserText(forms.stepFour.matchFreq, data.match_freq),
-      followMethod: preferUserText(forms.stepFour.followMethod, data.follow_method),
+      trainingFreq: preferUserMultiSelect(forms.stepFour.trainingFreq, data.training_freq),
+      matchFreq: preferUserMultiSelect(forms.stepFour.matchFreq, data.match_freq),
+      followMethod: preferUserMultiSelect(forms.stepFour.followMethod, data.follow_method),
     },
     stepFive: {
       ...forms.stepFive,
@@ -180,7 +186,7 @@ export function buildRegistrationPayload(
   return {
     firstname: stepOne.firstname,
     lastname: stepOne.lastname,
-    middlename: stepOne.postname,
+    middlename: stepOne.postname.trim(),
     gender: stepOne.gender,
     age: stepOne.ageRange,
     phone_full: stepOne.phone,
@@ -193,9 +199,9 @@ export function buildRegistrationPayload(
     contribution: stepThree.contribution,
     merch: stepThree.merchBudget,
     years: stepFour.years,
-    training_freq: stepFour.trainingFreq,
-    match_freq: stepFour.matchFreq,
-    follow_method: stepFour.followMethod,
+    training_freq: serializeMultiSelect(stepFour.trainingFreq),
+    match_freq: serializeMultiSelect(stepFour.matchFreq),
+    follow_method: serializeMultiSelect(stepFour.followMethod),
     social_fb: socialFlag(stepTwo.socialFb),
     social_x: socialFlag(stepTwo.socialX),
     social_ig: socialFlag(stepTwo.socialIg),

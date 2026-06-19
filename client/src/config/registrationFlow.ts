@@ -27,8 +27,8 @@ export const STEP_HEADERS: Partial<Record<number, StepHeaderContent>> = {
   2: {
     title: 'Informations Personnelles',
     titleLines: ['Informations', 'Personnelles'],
-    subtitle: 'Veuillez remplir tous les champs correctement',
-    subtitleLines: ['Veuillez remplir tous les champs', 'correctement'],
+    subtitle: 'Veuillez remplir les champs obligatoires',
+    subtitleLines: ['Veuillez remplir les champs', 'obligatoires'],
   },
   4: {
     title: 'Profil Social',

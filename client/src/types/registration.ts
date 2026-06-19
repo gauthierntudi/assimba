@@ -37,9 +37,9 @@ export type StepThreeForm = {
 export type StepFourForm = {
   section: string;
   years: string;
-  trainingFreq: string;
-  matchFreq: string;
-  followMethod: string;
+  trainingFreq: string[];
+  matchFreq: string[];
+  followMethod: string[];
 };
 
 export type MemberType = 'simple' | 'premium';
@@ -88,9 +88,9 @@ export const initialStepThreeForm: StepThreeForm = {
 export const initialStepFourForm: StepFourForm = {
   section: '',
   years: '',
-  trainingFreq: '',
-  matchFreq: '',
-  followMethod: '',
+  trainingFreq: [],
+  matchFreq: [],
+  followMethod: [],
 };
 
 export const initialStepFiveForm: StepFiveForm = {

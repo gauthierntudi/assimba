@@ -62,12 +62,13 @@ export function StepIdentityMobile({
       </label>
 
       <label className="reg-mobile__field">
-        <span className="visually-hidden">Votre post-nom</span>
+        <span className="visually-hidden">Post-nom (facultatif)</span>
         <input
           type="text"
-          placeholder="Votre post-nom"
+          placeholder="Post-nom (facultatif)"
           value={form.postname}
           onChange={(e) => onChange({ postname: e.target.value })}
+          autoComplete="additional-name"
         />
       </label>
 

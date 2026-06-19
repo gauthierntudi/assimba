@@ -295,6 +295,11 @@ body.reg-desktop-active {
   justify-content: center;
 }
 
+.reg-desktop-panel .reg-mobile__field--multi-select select {
+  font-size: 15px;
+  min-height: 132px;
+}
+
 .reg-desktop-panel .reg-mobile__footer-link,
 .reg-desktop-panel .reg-mobile__footer-credit {
   text-shadow: none;
