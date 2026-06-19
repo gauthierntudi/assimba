@@ -21,7 +21,7 @@ const PREMIUM_TEXT_COLOR = '#ffffff';
 // Calibré sur le cadre blanc des templates standard/premium (1003×649).
 const QR_PLACEMENT = {
   left: 776,
-  top: 386,
+  top: 388,
   size: 186,
 };
 
