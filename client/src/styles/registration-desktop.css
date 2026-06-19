@@ -295,9 +295,8 @@ body.reg-desktop-active {
   justify-content: center;
 }
 
-.reg-desktop-panel .reg-mobile__field--multi-select select {
+.reg-desktop-panel .reg-mobile__multi-select-trigger {
   font-size: 15px;
-  min-height: 132px;
 }
 
 .reg-desktop-panel .reg-mobile__footer-link,
