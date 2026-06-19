@@ -1,4 +1,4 @@
-import { copyFileSync, cpSync, existsSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -26,5 +26,19 @@ rmSync(path.join(apiDir, 'node_modules'), { recursive: true, force: true });
 cpSync(serverDist, apiDist, { recursive: true });
 cpSync(path.join(root, 'server/assets'), path.join(apiDir, 'assets'), { recursive: true });
 copyFileSync(engine, engineDest);
+
+const apiNodeModules = path.join(apiDir, 'node_modules');
+mkdirSync(apiNodeModules, { recursive: true });
+for (const dependency of ['sharp', 'qrcode']) {
+  const source = path.join(root, 'node_modules', dependency);
+  if (existsSync(source)) {
+    cpSync(source, path.join(apiNodeModules, dependency), { recursive: true });
+  }
+}
+
+const imgSource = path.join(root, 'node_modules/@img');
+if (existsSync(imgSource)) {
+  cpSync(imgSource, path.join(apiNodeModules, '@img'), { recursive: true });
+}
 
 console.log(`Prepared API bundle: ${apiDist}`);

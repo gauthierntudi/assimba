@@ -58,3 +58,13 @@ export function buildCardDownloadPageUrl(token: string): string {
 export function buildCardDownloadApiUrl(token: string): string {
   return `${env.appUrl}/api/cards/download?token=${encodeURIComponent(token)}`;
 }
+
+export function buildCardLinksForSupporter(supporterId: number, memberNumber: string) {
+  const token = createCardDownloadToken(supporterId, memberNumber);
+
+  return {
+    token,
+    cardDownloadUrl: buildCardDownloadApiUrl(token),
+    cardDownloadPageUrl: buildCardDownloadPageUrl(token),
+  };
+}

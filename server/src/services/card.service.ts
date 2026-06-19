@@ -1,14 +1,11 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import QRCode from 'qrcode';
-import sharp from 'sharp';
 import { prisma } from '../lib/prisma.js';
 import {
-  buildCardDownloadApiUrl,
-  buildCardDownloadPageUrl,
   createCardDownloadToken,
   parseCardDownloadToken,
+  buildCardDownloadPageUrl,
 } from './card-token.service.js';
 
 const CARD_WIDTH = 1003;
@@ -138,6 +135,8 @@ function buildQrPayload(supporter: {
 }
 
 async function buildQrCodePng(value: string): Promise<Buffer> {
+  const { default: QRCode } = await import('qrcode');
+
   return QRCode.toBuffer(value, {
     type: 'png',
     width: QR_PLACEMENT.size,
@@ -255,6 +254,8 @@ export async function generateSupporterCardPng(supporter: {
     buildQrPayload({ id: supporter.id, memberNumber: supporter.memberNumber }),
   );
 
+  const sharp = (await import('sharp')).default;
+
   return sharp(templatePath)
     .composite([
       { input: Buffer.from(overlay), top: 0, left: 0 },
@@ -307,15 +308,5 @@ export async function getCardDownloadByFanId(fanId: string) {
     buffer,
     filename: `carte-simba-${supporter.memberNumber}.png`,
     memberNumber: supporter.memberNumber,
-  };
-}
-
-export function buildCardLinksForSupporter(supporterId: number, memberNumber: string) {
-  const token = createCardDownloadToken(supporterId, memberNumber);
-
-  return {
-    token,
-    cardDownloadUrl: buildCardDownloadApiUrl(token),
-    cardDownloadPageUrl: buildCardDownloadPageUrl(token),
   };
 }

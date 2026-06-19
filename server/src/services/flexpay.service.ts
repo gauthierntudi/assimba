@@ -2,7 +2,7 @@ import { env, flexpayCallbackUrl } from '../config/env.js';
 import { buildInvoiceReference } from '../utils/payload.js';
 import { isValidFlexpayDrcPhone, toFlexpayPhone } from '../utils/phone.js';
 import { calculatePricing } from './pricing.service.js';
-import { buildCardLinksForSupporter } from './card.service.js';
+import { buildCardLinksForSupporter } from './card-token.service.js';
 import {
   attachFlexpayOrderNumber,
   markPaymentAttemptFailed,

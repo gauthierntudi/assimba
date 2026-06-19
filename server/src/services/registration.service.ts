@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma.js';
-import { buildCardLinksForSupporter } from './card.service.js';
+import { buildCardLinksForSupporter } from './card-token.service.js';
 import { sendMemberSMS } from './sms.service.js';
 
 async function generateUniqueMemberNumber(): Promise<string> {
