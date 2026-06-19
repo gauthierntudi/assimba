@@ -396,8 +396,12 @@ export function useRegistrationFlow() {
           `carte-simba-${paymentResult.memberNumber}.png`,
         );
       }
-    } catch {
-      toast.error('Impossible de télécharger votre carte pour le moment.');
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : 'Impossible de télécharger votre carte pour le moment.';
+      toast.error(message);
     }
   };
 

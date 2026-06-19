@@ -41,7 +41,8 @@ export async function fetchAndDownloadCard(
 
   const response = await fetch(`/api/cards/download?${search.toString()}`);
   if (!response.ok) {
-    throw new Error('Impossible de télécharger la carte.');
+    const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+    throw new Error(payload?.message ?? 'Impossible de télécharger la carte.');
   }
 
   const blob = await response.blob();

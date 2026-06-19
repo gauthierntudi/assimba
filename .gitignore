@@ -27,3 +27,4 @@ client/dist
 
 api/prisma-engine.so
 api/_dist/
+api/node_modules/

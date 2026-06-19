@@ -1,4 +1,9 @@
 {
+  "name": "simba-api-runtime",
+  "private": true,
   "type": "module",
-  "private": true
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "sharp": "0.35.1"
+  }
 }
