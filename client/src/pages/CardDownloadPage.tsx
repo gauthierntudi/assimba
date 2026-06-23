@@ -1,24 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, LoaderCircle } from 'lucide-react';
 import { CardDownloadShell } from '../components/card/CardDownloadShell';
-import { fetchAndDownloadCard } from '../api/cards';
+import { fetchCardBlob, saveCardBlob } from '../api/cards';
 
 type CardDownloadPageProps = {
   token: string;
 };
 
+function isIosDevice(): boolean {
+  return /iP(hone|od|ad)/i.test(navigator.userAgent);
+}
+
 export function CardDownloadPage({ token }: CardDownloadPageProps) {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Préparation de votre carte...');
+  const startedRef = useRef(false);
 
-  const retryDownload = async () => {
+  const runDownload = async () => {
     setStatus('loading');
-    setMessage('Nouvelle tentative de téléchargement...');
+    setMessage('Préparation de votre carte...');
 
     try {
-      await fetchAndDownloadCard({ token });
+      const blob = await fetchCardBlob({ token });
+      saveCardBlob(blob, 'carte-simba.png');
       setStatus('success');
-      setMessage('Votre carte a été téléchargée. Bienvenue dans la famille AS Simba Kamikazes !');
+      setMessage(
+        isIosDevice()
+          ? 'Votre carte est prête. Sur iPhone, elle s’ouvre dans un nouvel onglet : appuyez longuement sur l’image puis « Ajouter à Photos » ou « Enregistrer ».'
+          : 'Votre carte a été téléchargée. Bienvenue dans la famille AS Simba Kamikazes !',
+      );
     } catch {
       setStatus('error');
       setMessage(
@@ -28,30 +38,12 @@ export function CardDownloadPage({ token }: CardDownloadPageProps) {
   };
 
   useEffect(() => {
-    let cancelled = false;
+    if (startedRef.current) {
+      return;
+    }
 
-    const run = async () => {
-      try {
-        await fetchAndDownloadCard({ token });
-        if (!cancelled) {
-          setStatus('success');
-          setMessage('Votre carte a été téléchargée. Bienvenue dans la famille AS Simba Kamikazes !');
-        }
-      } catch {
-        if (!cancelled) {
-          setStatus('error');
-          setMessage(
-            'Impossible de télécharger votre carte. Utilisez votre FAN ID ou réessayez plus tard.',
-          );
-        }
-      }
-    };
-
-    void run();
-
-    return () => {
-      cancelled = true;
-    };
+    startedRef.current = true;
+    void runDownload();
   }, [token]);
 
   return (
@@ -92,7 +84,7 @@ export function CardDownloadPage({ token }: CardDownloadPageProps) {
           <button
             type="button"
             className="reg-mobile__cta card-download-cta"
-            onClick={() => void retryDownload()}
+            onClick={() => void runDownload()}
           >
             Réessayer
           </button>

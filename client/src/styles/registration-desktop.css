@@ -299,6 +299,14 @@ body.reg-desktop-active {
   font-size: 15px;
 }
 
+.reg-desktop-panel .reg-mobile__chips-trigger {
+  font-size: 15px;
+}
+
+.reg-desktop-panel .reg-mobile__chip {
+  font-size: 13px;
+}
+
 .reg-desktop-panel .reg-mobile__footer-link,
 .reg-desktop-panel .reg-mobile__footer-credit {
   text-shadow: none;

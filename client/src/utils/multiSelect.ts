@@ -23,6 +23,23 @@ export function parseMultiSelectValue(value: unknown): string[] {
   return [raw];
 }
 
+export function parseSingleSelectValue(value: unknown): string {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return '';
+    }
+
+    if (trimmed.includes(',') || trimmed.includes('|')) {
+      return parseMultiSelectValue(trimmed)[0] ?? '';
+    }
+
+    return trimmed;
+  }
+
+  return parseMultiSelectValue(value)[0] ?? '';
+}
+
 export function serializeMultiSelect(values: string[]): string {
   return values.map((value) => value.trim()).filter(Boolean).join(MULTI_SELECT_DELIMITER);
 }

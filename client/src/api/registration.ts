@@ -1,6 +1,6 @@
 import { api } from './client';
 import { toFlexpayPhone } from '../utils/phone';
-import { parseMultiSelectValue, serializeMultiSelect } from '../utils/multiSelect';
+import { parseMultiSelectValue, parseSingleSelectValue, serializeMultiSelect } from '../utils/multiSelect';
 import type {
   MemberType,
   StepFiveForm,
@@ -86,8 +86,8 @@ export function mapDraftToFormPatch(data: Record<string, unknown>): DraftFormPat
     stepFour: {
       section: String(data.section ?? ''),
       years: data.years != null ? String(data.years) : '',
-      trainingFreq: parseMultiSelectValue(data.training_freq),
-      matchFreq: parseMultiSelectValue(data.match_freq),
+      trainingFreq: parseSingleSelectValue(data.training_freq),
+      matchFreq: parseSingleSelectValue(data.match_freq),
       followMethod: parseMultiSelectValue(data.follow_method),
     },
     stepFive: {
@@ -118,6 +118,11 @@ function preferUserText(userValue: string, dbValue: unknown): string {
 
 function preferUserBool(userValue: boolean, dbValue: boolean): boolean {
   return userValue || dbValue;
+}
+
+function preferUserSingleSelect(userValue: string, dbValue: unknown): string {
+  if (!isBlank(userValue)) return userValue.trim();
+  return parseSingleSelectValue(dbValue);
 }
 
 function preferUserMultiSelect(userValues: string[], dbValue: unknown): string[] {
@@ -164,8 +169,8 @@ export function mergeDraftIntoForms(
       ...forms.stepFour,
       section: preferUserText(forms.stepFour.section, data.section),
       years: preferUserText(forms.stepFour.years, data.years),
-      trainingFreq: preferUserMultiSelect(forms.stepFour.trainingFreq, data.training_freq),
-      matchFreq: preferUserMultiSelect(forms.stepFour.matchFreq, data.match_freq),
+      trainingFreq: preferUserSingleSelect(forms.stepFour.trainingFreq, data.training_freq),
+      matchFreq: preferUserSingleSelect(forms.stepFour.matchFreq, data.match_freq),
       followMethod: preferUserMultiSelect(forms.stepFour.followMethod, data.follow_method),
     },
     stepFive: {
@@ -199,8 +204,8 @@ export function buildRegistrationPayload(
     contribution: stepThree.contribution,
     merch: stepThree.merchBudget,
     years: stepFour.years,
-    training_freq: serializeMultiSelect(stepFour.trainingFreq),
-    match_freq: serializeMultiSelect(stepFour.matchFreq),
+    training_freq: stepFour.trainingFreq,
+    match_freq: stepFour.matchFreq,
     follow_method: serializeMultiSelect(stepFour.followMethod),
     social_fb: socialFlag(stepTwo.socialFb),
     social_x: socialFlag(stepTwo.socialX),

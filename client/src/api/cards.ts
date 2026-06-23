@@ -1,17 +1,14 @@
-export function downloadCardFromUrl(url: string, filename = 'carte-simba.png'): void {
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.rel = 'noopener';
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+function isIosDevice(): boolean {
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
+
+  return /iP(hone|od|ad)/i.test(navigator.userAgent);
 }
 
-export async function fetchAndDownloadCard(
+export async function fetchCardBlob(
   params: { token?: string; order?: string; fanId?: string },
-  filename = 'carte-simba.png',
-): Promise<void> {
+): Promise<Blob> {
   if (params.fanId) {
     const response = await fetch('/api/cards/download-by-fan-id', {
       method: 'POST',
@@ -24,11 +21,7 @@ export async function fetchAndDownloadCard(
       throw new Error(payload?.message ?? 'Impossible de télécharger la carte.');
     }
 
-    const blob = await response.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    downloadCardFromUrl(objectUrl, filename);
-    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-    return;
+    return response.blob();
   }
 
   const search = new URLSearchParams();
@@ -45,11 +38,55 @@ export async function fetchAndDownloadCard(
     throw new Error(payload?.message ?? 'Impossible de télécharger la carte.');
   }
 
-  const blob = await response.blob();
-  const objectUrl = URL.createObjectURL(blob);
-  downloadCardFromUrl(objectUrl, filename);
+  return response.blob();
+}
 
-  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+export function saveCardBlob(blob: Blob, filename = 'carte-simba.png'): void {
+  const objectUrl = URL.createObjectURL(blob);
+
+  if (isIosDevice()) {
+    const opened = window.open(objectUrl, '_blank');
+    if (!opened) {
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+    return;
+  }
+
+  const link = document.createElement('a');
+  link.href = objectUrl;
+  link.download = filename;
+  link.rel = 'noopener';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+}
+
+export async function fetchAndDownloadCard(
+  params: { token?: string; order?: string; fanId?: string },
+  filename = 'carte-simba.png',
+): Promise<void> {
+  const blob = await fetchCardBlob(params);
+  saveCardBlob(blob, filename);
+}
+
+export function downloadCardFromUrl(url: string, filename = 'carte-simba.png'): void {
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.rel = 'noopener';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 }
 
 export function buildCardDownloadUrl(params: { token?: string; order?: string }): string {

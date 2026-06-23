@@ -8,6 +8,11 @@ const AUTOPLAY_PAUSE_MS = 10000;
 
 const IMAGE_SLIDES = [
   {
+    src: '/img/img01.jpg',
+    label: 'La communauté',
+    text: 'Rejoignez une communauté de passionnés qui grandit chaque saison.',
+  },
+  {
     src: '/img/s2.jpg',
     label: 'La passion',
     text: 'Partagez l\u2019émotion du stade avec des milliers de supporters.',
@@ -37,30 +42,6 @@ function toLogicalSlide(trackIndex: number) {
   return trackIndex - 1;
 }
 
-function CommunitySlideCard({ hidden = false }: { hidden?: boolean }) {
-  return (
-    <article className="welcome-community__card" aria-hidden={hidden || undefined}>
-      <div className="welcome-community__stats">
-        <p className="welcome-community__label">La communauté</p>
-        <div className="welcome-community__figures">
-          <p className="welcome-community__count">+2K</p>
-          <p className="welcome-community__metric">Supporters.</p>
-        </div>
-        <p className="welcome-community__caption">Une communauté qui grandit chaque jour</p>
-      </div>
-
-      <div className="welcome-community__visual">
-        <div className="welcome-community__photo">
-          <img src="/img/img01.jpg" alt={hidden ? '' : 'Supporters AS Simba'} />
-        </div>
-        <p className="welcome-community__quote">
-          Rejoignez une communauté de passionnés qui grandit chaque saison.
-        </p>
-      </div>
-    </article>
-  );
-}
-
 function ImageSlideCard({
   slide,
   hidden = false,
@@ -83,11 +64,7 @@ function ImageSlideCard({
 }
 
 function renderSlide(slideIndex: number, hidden = false) {
-  if (slideIndex === 0) {
-    return <CommunitySlideCard hidden={hidden} />;
-  }
-
-  return <ImageSlideCard slide={IMAGE_SLIDES[slideIndex - 1]} hidden={hidden} />;
+  return <ImageSlideCard slide={IMAGE_SLIDES[slideIndex]} hidden={hidden} />;
 }
 
 type WelcomeCarouselDotsProps = {

@@ -291,6 +291,87 @@ body.reg-mobile-active {
   pointer-events: none;
 }
 
+.reg-mobile__field--chips-select {
+  height: auto;
+  min-height: var(--reg-field-height);
+  padding: 8px 44px 8px 12px;
+}
+
+.reg-mobile__chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: calc(var(--reg-field-height) - 16px);
+}
+
+.reg-mobile__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(205, 4, 4, 0.1);
+  color: #1c1412;
+  font-family: 'Poppins', 'Barlow', sans-serif;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.reg-mobile__chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(205, 4, 4, 0.18);
+  color: #cd0404;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.reg-mobile__chips-trigger {
+  flex: 1 1 auto;
+  min-width: 120px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: #1c1412;
+  font-family: 'Poppins', 'Barlow', sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reg-mobile__chips-trigger--placeholder {
+  color: #7f909f;
+}
+
+.reg-mobile__chips-option {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: 0;
+  background: transparent;
+  color: #1c1412;
+  font-family: 'Poppins', 'Barlow', sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reg-mobile__chips-option:hover {
+  background: rgba(205, 4, 4, 0.06);
+}
+
 .reg-mobile__field--phone-iti {
   padding: 0;
   overflow: hidden;
