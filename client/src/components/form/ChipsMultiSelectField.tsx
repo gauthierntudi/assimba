@@ -48,7 +48,6 @@ export function ChipsMultiSelectField({
     }
 
     onChange([...values, value]);
-    setOpen(false);
   };
 
   const removeValue = (value: string) => {
