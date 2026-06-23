@@ -1,16 +1,22 @@
-import { REGISTRATION_STEP_LABELS } from '../../config/registrationFlow';
-
-const TOTAL_STEPS = 6;
+import {
+  REGISTRATION_STEP_LABELS,
+  getVisibleRegistrationSteps,
+} from '../../config/registrationFlow';
 
 type DesktopStepNavProps = {
   currentStep: number;
 };
 
 export function DesktopStepNav({ currentStep }: DesktopStepNavProps) {
+  const visibleSteps = getVisibleRegistrationSteps();
+  const activeIndex = visibleSteps.indexOf(currentStep);
+
   return (
-    <ol className="reg-desktop__steps" aria-label={`Étape ${currentStep} sur ${TOTAL_STEPS}`}>
-      {Array.from({ length: TOTAL_STEPS }, (_, index) => {
-        const step = index + 1;
+    <ol
+      className="reg-desktop__steps"
+      aria-label={`Étape ${Math.max(activeIndex + 1, 1)} sur ${visibleSteps.length}`}
+    >
+      {visibleSteps.map((step) => {
         const isActive = step === currentStep;
         const isDone = step < currentStep;
 

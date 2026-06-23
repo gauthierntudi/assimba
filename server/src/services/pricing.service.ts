@@ -1,9 +1,8 @@
-const MEMBER_PRICES_CDF = {
-  simple: 2500,
-  premium: 12500,
-} as const;
+import { getMemberPriceUsd } from '../config/app-settings.js';
 
-export type MemberType = keyof typeof MEMBER_PRICES_CDF;
+const CDF_PER_USD_FALLBACK = 2500;
+
+export type MemberType = 'simple' | 'premium';
 export type CurrencyChoice = 'CDF' | 'USD';
 
 export type PricingResult = {
@@ -31,14 +30,15 @@ export async function calculatePricing(
   currencyChoice: string,
 ): Promise<PricingResult> {
   const type: MemberType = memberType === 'premium' ? 'premium' : 'simple';
-  const baseAmountCdf = MEMBER_PRICES_CDF[type];
-  const usdRate = (await fetchUsdRateFromCdf()) ?? 1 / 2500;
+  const baseAmountUsd = getMemberPriceUsd(type);
+  const usdRate = (await fetchUsdRateFromCdf()) ?? 1 / CDF_PER_USD_FALLBACK;
+  const baseAmountCdf = Math.round(baseAmountUsd / usdRate);
 
   if (currencyChoice === 'USD') {
     return {
-      amount: Math.round(baseAmountCdf * usdRate * 100) / 100,
+      amount: baseAmountUsd,
       currency: 'USD',
-      amountUsdEquivalent: Math.round(baseAmountCdf * usdRate * 100) / 100,
+      amountUsdEquivalent: baseAmountUsd,
       baseAmountCdf,
     };
   }
@@ -46,7 +46,7 @@ export async function calculatePricing(
   return {
     amount: baseAmountCdf,
     currency: 'CDF',
-    amountUsdEquivalent: Math.round(baseAmountCdf * usdRate * 100) / 100,
+    amountUsdEquivalent: baseAmountUsd,
     baseAmountCdf,
   };
 }

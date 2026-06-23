@@ -1,9 +1,6 @@
-export const MEMBER_PRICES_CDF = {
-  simple: 2500,
-  premium: 12500,
-} as const;
+import { getMemberPriceUsd } from '../config/appSettings';
 
-export const USD_RATE_FALLBACK = 2500;
+export const CDF_PER_USD_FALLBACK = 2500;
 
 export const MEMBER_TYPE_OPTIONS = [
   { value: 'simple', label: 'Membre Simple' },
@@ -21,7 +18,7 @@ export const PAYMENT_TYPE_OPTIONS = [
 ] as const;
 
 export function formatMemberOptionLabel(
-  memberType: keyof typeof MEMBER_PRICES_CDF,
+  memberType: 'simple' | 'premium',
   currency: 'CDF' | 'USD',
 ): string {
   const base = MEMBER_TYPE_OPTIONS.find((o) => o.value === memberType)?.label ?? '';
@@ -30,29 +27,29 @@ export function formatMemberOptionLabel(
 }
 
 export function formatPriceAmount(
-  memberType: keyof typeof MEMBER_PRICES_CDF,
+  memberType: 'simple' | 'premium',
   currency: 'CDF' | 'USD',
 ): string {
-  const cdf = MEMBER_PRICES_CDF[memberType];
+  const usd = getMemberPriceUsd(memberType);
 
-  if (currency === 'CDF') {
-    return `${new Intl.NumberFormat('fr-FR').format(cdf)} FC`;
+  if (currency === 'USD') {
+    return `${new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(usd)} USD`;
   }
 
-  const usd = cdf / USD_RATE_FALLBACK;
-  return `${new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(usd)} USD`;
+  const cdf = usd * CDF_PER_USD_FALLBACK;
+  return `${new Intl.NumberFormat('fr-FR').format(cdf)} FC`;
 }
 
 export function formatDisplayPrice(
-  memberType: keyof typeof MEMBER_PRICES_CDF,
+  memberType: 'simple' | 'premium',
   currency: 'CDF' | 'USD',
 ): string {
-  const cdf = MEMBER_PRICES_CDF[memberType];
+  const usd = getMemberPriceUsd(memberType);
 
-  if (currency === 'CDF') {
-    return `${new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cdf)} CDF`;
+  if (currency === 'USD') {
+    return `${new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(usd)} USD`;
   }
 
-  const usd = cdf / USD_RATE_FALLBACK;
-  return `${new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(usd)} USD`;
+  const cdf = usd * CDF_PER_USD_FALLBACK;
+  return `${new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cdf)} CDF`;
 }

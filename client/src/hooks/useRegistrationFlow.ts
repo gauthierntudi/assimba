@@ -11,7 +11,7 @@ import {
   submitCardPayment,
   type RegistrationForms,
 } from '../api/registration';
-import { FORM_IDS } from '../config/registrationFlow';
+import { FORM_IDS, getNextRegistrationStep, getPrevRegistrationStep } from '../config/registrationFlow';
 import { PAYMENT_FAILURE_MESSAGES } from '../types/paymentResult';
 import {
   initialStepFiveForm,
@@ -311,7 +311,7 @@ export function useRegistrationFlow() {
 
     try {
       await saveDraftQuietly();
-      setCurrentStep((step) => Math.min(step + 1, 6));
+      setCurrentStep((step) => getNextRegistrationStep(step));
     } finally {
       setLoading(null);
     }
@@ -406,7 +406,7 @@ export function useRegistrationFlow() {
   };
 
   const handlePrev = () => {
-    setCurrentStep((step) => Math.max(step - 1, 2));
+    setCurrentStep((step) => getPrevRegistrationStep(step));
   };
 
   const handleStepOneChange = (patch: Partial<typeof stepOne>) => {

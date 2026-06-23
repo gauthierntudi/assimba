@@ -1,14 +1,19 @@
-const TOTAL_STEPS = 6;
+import { getVisibleRegistrationSteps } from '../../config/registrationFlow';
 
 type MobileStepDotsProps = {
   currentStep: number;
 };
 
 export function MobileStepDots({ currentStep }: MobileStepDotsProps) {
+  const visibleSteps = getVisibleRegistrationSteps();
+  const activeIndex = visibleSteps.indexOf(currentStep);
+
   return (
-    <div className="reg-mobile__dots" aria-label={`Étape ${currentStep} sur ${TOTAL_STEPS}`}>
-      {Array.from({ length: TOTAL_STEPS }, (_, index) => {
-        const step = index + 1;
+    <div
+      className="reg-mobile__dots"
+      aria-label={`Étape ${Math.max(activeIndex + 1, 1)} sur ${visibleSteps.length}`}
+    >
+      {visibleSteps.map((step) => {
         const className = [
           'reg-mobile__dot',
           step === currentStep ? 'reg-mobile__dot--active' : '',

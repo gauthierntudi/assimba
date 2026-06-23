@@ -36,6 +36,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), asSimbaPwaPlugin(), apiHealthPlugin(apiOrigin)],
+    envPrefix: ['VITE_', 'PROFIL_', 'PRICE_'],
     server: {
       port: 5173,
       proxy: {
