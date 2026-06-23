@@ -7,6 +7,7 @@ import cardsRouter from './routes/cards.js';
 import paymentsRouter from './routes/payments.js';
 import supportersRouter from './routes/supporters.js';
 import webhooksRouter from './routes/webhooks.js';
+import smsTestRouter from './routes/sms-test.js';
 
 const app = express();
 
@@ -27,6 +28,10 @@ app.use('/api/supporters', supportersRouter);
 app.use('/api/cards', cardsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/webhooks', webhooksRouter);
+
+if (env.smsTest.enabled) {
+  app.use('/api/sms-test', smsTestRouter);
+}
 
 app.use(errorHandler);
 

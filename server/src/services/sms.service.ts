@@ -1,4 +1,16 @@
 import { env } from '../config/env.js';
+import { toFlexpayPhone } from '../utils/phone.js';
+
+export type SmsProvider = 'TWILIO' | 'UNIKRON';
+
+export function resolveSmsProvider(): SmsProvider {
+  return env.sms.distribution === 'UNIKRON' ? 'UNIKRON' : 'TWILIO';
+}
+
+function toTwilioE164(phone: string): string {
+  const digits = toFlexpayPhone(phone);
+  return digits ? `+${digits}` : phone.trim();
+}
 
 function normalizeUnikronNumbers(numbers: string): string {
   const parts = numbers.split(',').map((part) => part.trim());
@@ -19,14 +31,15 @@ function normalizeUnikronNumbers(numbers: string): string {
 async function sendTwilioSMS(phone: string, message: string): Promise<boolean> {
   const { twilioSid, twilioToken, twilioFrom } = env.sms;
   if (!twilioSid || !twilioToken || !twilioFrom || twilioFrom === '+1234567890') {
-    console.error(`Twilio credentials missing. Cannot send SMS to ${phone}.`);
+    console.error(`[sms:twilio] Credentials missing. Cannot send SMS to ${phone}.`);
     return false;
   }
 
+  const to = toTwilioE164(phone);
   const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`;
   const body = new URLSearchParams({
     From: twilioFrom,
-    To: phone,
+    To: to,
     Body: message,
   });
 
@@ -42,7 +55,9 @@ async function sendTwilioSMS(phone: string, message: string): Promise<boolean> {
   });
 
   if (!response.ok) {
-    console.error(`Twilio SMS failed with code ${response.status}: ${await response.text()}`);
+    console.error(
+      `[sms:twilio] Failed (${response.status}) to ${to}: ${await response.text()}`,
+    );
     return false;
   }
 
@@ -54,7 +69,7 @@ async function sendUnikronSMS(phone: string, message: string): Promise<boolean> 
   let sender = env.sms.unikronSender.trim() || 'UNIKRON';
 
   if (!appKey) {
-    console.error(`Unikron AppKey missing. Cannot send SMS to ${phone}.`);
+    console.error(`[sms:unikron] AppKey missing. Cannot send SMS to ${phone}.`);
     return false;
   }
 
@@ -64,7 +79,7 @@ async function sendUnikronSMS(phone: string, message: string): Promise<boolean> 
 
   const normalizedNumber = normalizeUnikronNumbers(phone);
   if (!normalizedNumber) {
-    console.error(`Unikron number invalid. Cannot send SMS to ${phone}.`);
+    console.error(`[sms:unikron] Number invalid. Cannot send SMS to ${phone}.`);
     return false;
   }
 
@@ -83,7 +98,9 @@ async function sendUnikronSMS(phone: string, message: string): Promise<boolean> 
   });
 
   if (!response.ok) {
-    console.error(`Unikron SMS failed with code ${response.status}: ${await response.text()}`);
+    console.error(
+      `[sms:unikron] Failed (${response.status}) to ${normalizedNumber}: ${await response.text()}`,
+    );
     return false;
   }
 
@@ -94,7 +111,7 @@ async function sendUnikronSMS(phone: string, message: string): Promise<boolean> 
   };
 
   if (decoded.status && decoded.status !== 'processed') {
-    console.error(`Unikron SMS unexpected response: ${decoded.message ?? 'Unknown response'}`);
+    console.error(`[sms:unikron] Unexpected response: ${decoded.message ?? 'Unknown response'}`);
     return false;
   }
 
@@ -102,7 +119,7 @@ async function sendUnikronSMS(phone: string, message: string): Promise<boolean> 
   if (!first) return true;
 
   if (first.error) {
-    console.error(`Unikron SMS error for ${phone}: ${JSON.stringify(first.error)}`);
+    console.error(`[sms:unikron] Error for ${phone}: ${JSON.stringify(first.error)}`);
     return false;
   }
 
@@ -119,7 +136,10 @@ export async function sendMemberSMS(
     ? `Félicitations ${name} ! Votre inscription est validée. FAN ID (Numéro membre) : ${memberNumber}. Téléchargez votre carte : ${cardDownloadUrl}`
     : `Félicitations ${name} ! Votre inscription est validée. FAN ID (Numéro membre) : ${memberNumber}. Merci de votre soutien !`;
 
-  if (env.sms.distribution === 'UNIKRON') {
+  const provider = resolveSmsProvider();
+  console.log(`[sms] provider=${provider} to=${toFlexpayPhone(phone) || phone}`);
+
+  if (provider === 'UNIKRON') {
     return sendUnikronSMS(phone, message);
   }
 

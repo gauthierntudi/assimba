@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test SMS Orange — AS Simba</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #1c1412;
+        --panel: #fff;
+        --accent: #cd0404;
+        --muted: #6b7280;
+        --border: #e8e6ef;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, system-ui, sans-serif;
+        background: linear-gradient(180deg, #8f0404 0%, #1c1412 100%);
+        color: #111;
+      }
+
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+
+      .hero {
+        color: #fff;
+        margin-bottom: 24px;
+      }
+
+      .hero h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      .hero p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.5;
+      }
+
+      .panel {
+        background: var(--panel);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+      }
+
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      .tab {
+        border: 1px solid var(--border);
+        background: #f8f7fb;
+        color: #111;
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .tab.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+
+      .section {
+        display: none;
+      }
+
+      .section.active {
+        display: block;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 14px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        margin-top: 6px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 12px 16px;
+        background: var(--accent);
+        color: #fff;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button.secondary {
+        background: #f3f4f6;
+        color: #111;
+      }
+
+      .status {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 10px;
+        background: #f8f7fb;
+        border: 1px solid var(--border);
+        white-space: pre-wrap;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        line-height: 1.5;
+        max-height: 360px;
+        overflow: auto;
+      }
+
+      .hint {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      @media (max-width: 720px) {
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="hero">
+        <h1>Test SMS Orange RDC</h1>
+        <p>
+          Page hors application pour tester l&apos;API Orange SMS RDC.
+          <strong>HTTP 201 = accepté par Orange, pas encore reçu sur le téléphone.</strong>
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="row">
+          <label>
+            Pays (admin)
+            <input id="country" type="text" value="COD" />
+          </label>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" data-tab="send">Envoyer SMS</button>
+          <button class="tab" data-tab="delivery">Livraison / DR</button>
+          <button class="tab" data-tab="subscribe">Souscription DR</button>
+          <button class="tab" data-tab="admin">Contrats / Stats</button>
+          <button class="tab" data-tab="token">Token OAuth</button>
+        </div>
+
+        <section class="section active" id="section-send">
+          <label>
+            Destinataire
+            <input id="to" type="tel" placeholder="+243812345678" />
+          </label>
+          <label>
+            Message (160 car. max)
+            <textarea id="message" maxlength="160">Test SMS Orange AS Simba</textarea>
+          </label>
+          <label>
+            Sender name (optionnel, whitelist Orange)
+            <input id="senderName" type="text" placeholder="Laisser vide si non autorisé" />
+          </label>
+          <p class="hint">
+            Format : <code>0812345678</code> ou <code>+243812345678</code> (mobile actif RDC, 9 chiffres après 243).
+          </p>
+          <div class="actions">
+            <button id="btnSend" type="button">Envoyer le SMS</button>
+          </div>
+        </section>
+
+        <section class="section" id="section-delivery">
+          <label>
+            Resource ID (retourné après envoi)
+            <input id="resourceId" type="text" placeholder="bcc48a09-fcea-4539-9e9f-65897b8245b5" />
+          </label>
+          <div class="actions">
+            <button id="btnDeliveryStatus" type="button" class="secondary">Statut livraison Orange</button>
+            <button id="btnDeliveryReceipts" type="button" class="secondary">DR reçus (webhook)</button>
+          </div>
+          <p class="hint">
+            En local, les DR n&apos;arrivent pas (Orange exige HTTPS public). En prod :
+            souscrire l&apos;URL <code>/api/webhooks/orange-sms-dr</code> et la whitelister chez Orange.
+          </p>
+        </section>
+
+        <section class="section" id="section-subscribe">
+          <label>
+            URL de callback DR (notifyURL)
+            <input id="notifyUrl" type="url" placeholder="https://..." />
+          </label>
+          <p class="hint">
+            Endpoint Orange :
+            <code>POST /smsmessaging/v1/outbound/{senderAddress}/subscriptions</code>
+          </p>
+          <div class="actions">
+            <button id="btnSubscribe" type="button">Créer la souscription DR</button>
+          </div>
+        </section>
+
+        <section class="section" id="section-admin">
+          <div class="actions">
+            <button id="btnContracts" type="button" class="secondary">Lister les contrats</button>
+            <button id="btnStatistics" type="button" class="secondary">Lister les statistiques</button>
+          </div>
+        </section>
+
+        <section class="section" id="section-token">
+          <div class="actions">
+            <button id="btnToken" type="button" class="secondary">Obtenir un token OAuth</button>
+            <button id="btnConfig" type="button" class="secondary">Lire la config serveur</button>
+          </div>
+        </section>
+
+        <pre class="status" id="output">Chargement de la configuration…</pre>
+      </div>
+    </div>
+
+    <script>
+      const output = document.getElementById('output');
+      const countryInput = document.getElementById('country');
+      const notifyUrlInput = document.getElementById('notifyUrl');
+      const resourceIdInput = document.getElementById('resourceId');
+
+      function headers() {
+        return { 'Content-Type': 'application/json' };
+      }
+
+      function show(data) {
+        output.textContent =
+          typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      }
+
+      async function request(path, options = {}) {
+        const response = await fetch(path, options);
+        const payload = await response.json().catch(() => ({
+          success: false,
+          message: 'Réponse non JSON',
+        }));
+        show({ status: response.status, ...payload });
+        return payload;
+      }
+
+      document.querySelectorAll('.tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach((item) => item.classList.remove('active'));
+          document.querySelectorAll('.section').forEach((item) => item.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(`section-${tab.dataset.tab}`).classList.add('active');
+        });
+      });
+
+      document.getElementById('btnSend').addEventListener('click', async () => {
+        const payload = await request('/api/sms-test/send', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({
+            to: document.getElementById('to').value,
+            message: document.getElementById('message').value,
+            senderName: document.getElementById('senderName').value,
+          }),
+        });
+        if (payload?.resourceId) {
+          resourceIdInput.value = payload.resourceId;
+        }
+      });
+
+      document.getElementById('btnDeliveryStatus').addEventListener('click', () => {
+        const resourceId = resourceIdInput.value.trim();
+        if (!resourceId) {
+          show('Resource ID requis (envoyez un SMS d’abord).');
+          return;
+        }
+        request(`/api/sms-test/delivery-status/${encodeURIComponent(resourceId)}`, {
+          headers: headers(),
+        });
+      });
+
+      document.getElementById('btnDeliveryReceipts').addEventListener('click', () => {
+        request('/api/sms-test/delivery-receipts', { headers: headers() });
+      });
+
+      document.getElementById('btnSubscribe').addEventListener('click', () => {
+        request('/api/sms-test/subscribe', {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({
+            notifyUrl: notifyUrlInput.value,
+          }),
+        });
+      });
+
+      document.getElementById('btnContracts').addEventListener('click', () => {
+        const country = encodeURIComponent(countryInput.value.trim() || 'COD');
+        request(`/api/sms-test/contracts?country=${country}`, {
+          headers: headers(),
+        });
+      });
+
+      document.getElementById('btnStatistics').addEventListener('click', () => {
+        const country = encodeURIComponent(countryInput.value.trim() || 'COD');
+        request(`/api/sms-test/statistics?country=${country}`, {
+          headers: headers(),
+        });
+      });
+
+      document.getElementById('btnToken').addEventListener('click', () => {
+        request('/api/sms-test/token', {
+          method: 'POST',
+          headers: headers(),
+          body: '{}',
+        });
+      });
+
+      document.getElementById('btnConfig').addEventListener('click', () => {
+        request('/api/sms-test/config', {
+          headers: headers(),
+        });
+      });
+
+      request('/api/sms-test/config', { headers: headers() }).then((payload) => {
+        if (payload?.config?.defaultNotifyUrl) {
+          notifyUrlInput.value = payload.config.defaultNotifyUrl;
+        }
+      });
+    </script>
+  </body>
+</html>

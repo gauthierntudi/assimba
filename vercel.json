@@ -17,7 +17,7 @@
       "destination": "/img/appiconset/32.png"
     },
     {
-      "source": "/((?!api/|assets/|img/|vendor/|sw\\.js|workbox-|manifest\\.webmanifest|registerSW\\.js).*)",
+      "source": "/((?!api/|assets/|img/|vendor/|sw\\.js|workbox-|manifest\\.webmanifest|registerSW\\.js|sms-test\\.html).*)",
       "destination": "/index.html"
     }
   ],

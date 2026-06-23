@@ -1,6 +1,7 @@
 import { env, flexpayCallbackUrl } from '../config/env.js';
 import { buildInvoiceReference } from '../utils/payload.js';
 import { isValidFlexpayDrcPhone, toFlexpayPhone } from '../utils/phone.js';
+import { isAdminBypassPhone } from '../config/admin-phones.js';
 import { calculatePricing } from './pricing.service.js';
 import { buildCardLinksForSupporter } from './card-token.service.js';
 import {
@@ -102,17 +103,25 @@ export async function initiatePayment(body: Record<string, unknown>) {
   }
 
   const supporterId = await upsertSupporter(input, { includeMemberType: true });
+  const isAdminRetest = isAdminBypassPhone(input.phone);
 
   const existingInvoice = await prisma.invoice.findUnique({
     where: { supporterId },
     select: { status: true },
   });
 
-  if (existingInvoice?.status === 'paid') {
+  if (existingInvoice?.status === 'paid' && !isAdminRetest) {
     return {
       success: false as const,
       message: 'Ce numéro est déjà utilisé.',
     };
+  }
+
+  if (isAdminRetest) {
+    await prisma.supporter.update({
+      where: { id: supporterId },
+      data: { memberNumber: null },
+    });
   }
 
   const flexpayRef = buildInvoiceReference(supporterId);

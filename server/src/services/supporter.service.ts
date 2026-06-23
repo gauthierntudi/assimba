@@ -6,6 +6,7 @@ import {
   type SupporterInput,
 } from '../utils/payload.js';
 import { normalizeStoragePhone, phoneLookupVariants } from '../utils/phone.js';
+import { isAdminBypassPhone } from '../config/admin-phones.js';
 
 export async function upsertSupporter(
   input: SupporterInput,
@@ -49,6 +50,10 @@ export function parseBodyToSupporter(body: Record<string, unknown>): SupporterIn
 }
 
 export async function checkPhone(phone: string) {
+  if (isAdminBypassPhone(phone)) {
+    return { success: true as const, exists: false as const };
+  }
+
   const supporter = await prisma.supporter.findFirst({
     where: { phone: { in: phoneLookupVariants(phone) } },
   });

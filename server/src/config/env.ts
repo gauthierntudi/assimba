@@ -22,6 +22,14 @@ function normalizeFlexpayToken(value: string | undefined): string {
   return raw.startsWith('Bearer ') ? raw : `Bearer ${raw}`;
 }
 
+function normalizeBasicAuth(value: string | undefined): string {
+  const raw = (value ?? '').trim().replace(/^['"]|['"]$/g, '');
+  if (!raw) return '';
+  if (raw.startsWith('Basic ')) return raw;
+  if (/^[A-Za-z0-9+/=]+$/.test(raw)) return `Basic ${raw}`;
+  return raw;
+}
+
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: Number(process.env.PORT ?? 4000),
@@ -52,6 +60,21 @@ export const env = {
     twilioFrom: process.env.TWILIO_FROM ?? '',
     unikronAppKey: process.env.UNIKRON_APP_KEY ?? process.env.TOKEN_UNIKRON_SMS ?? '',
     unikronSender: process.env.UNIKRON_SENDER ?? 'UNIKRON',
+  },
+  smsTest: {
+    enabled: ['true', '1', 'yes', 'on'].includes(
+      String(process.env.SMS_TEST_ENABLED ?? '').trim().toLowerCase(),
+    ),
+    pageKey: process.env.SMS_TEST_PAGE_KEY?.trim() ?? '',
+  },
+  orangeSms: {
+    basicAuth: normalizeBasicAuth(
+      process.env.ORANGE_SMS_BASIC_AUTH ?? process.env.SMS_TEST_KEY,
+    ),
+    clientId: process.env.ORANGE_SMS_CLIENT_ID?.trim() ?? '',
+    clientSecret: process.env.ORANGE_SMS_CLIENT_SECRET?.trim() ?? '',
+    senderAddress: process.env.ORANGE_SMS_SENDER_ADDRESS?.trim() ?? '',
+    senderName: process.env.ORANGE_SMS_SENDER_NAME?.trim() ?? '',
   },
 } as const;
 
